@@ -25,7 +25,7 @@ class Sensor{
       Utility::ArduinoMessage packet;
 
         packet.device = device;
-        packet.message_type = ArduinoValue::STATUS;
+        packet.message_type = MessageType::STATUS;
         packet.type_value = type_value;
         packet.value = value;
 

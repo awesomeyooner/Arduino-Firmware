@@ -32,7 +32,7 @@ Motor drive_motor(
 Sensor voltage_sensor(
   VoltageSensorConstants::DEVICE, 
   VoltageSensorConstants::CHANNEL, 
-  ArduinoValue::VOLTAGE
+  TypeValue::VOLTAGE
 );
 
 void setup() {

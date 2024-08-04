@@ -34,7 +34,7 @@ class Servo{
       this->neutral = neutral;
       this->max_right = max_right;
 
-      control_mode = ArduinoValue::PERCENT;
+      control_mode = TypeValue::PERCENT;
       control_value = 0;
 
       position = 0;
@@ -62,7 +62,7 @@ class Servo{
       if(message.device != device)
         return;
 
-      if(message.message_type == ArduinoValue::CONTROL){
+      if(message.message_type == MessageType::CONTROL){
         control_mode = message.type_value;
         control_value = message.value;
       }
@@ -72,8 +72,8 @@ class Servo{
       Utility::ArduinoMessage packet;
 
         packet.device = device;
-        packet.message_type = ArduinoValue::STATUS;
-        packet.type_value = ArduinoValue::POSITION;
+        packet.message_type = MessageType::STATUS;
+        packet.type_value = TypeValue::POSITION;
         packet.value = position;
 
       return packet; 
@@ -83,8 +83,8 @@ class Servo{
       Utility::ArduinoMessage packet;
 
         packet.device = device;
-        packet.message_type = ArduinoValue::STATUS;
-        packet.type_value = ArduinoValue::VELOCITY;
+        packet.message_type = MessageType::STATUS;
+        packet.type_value = TypeValue::VELOCITY;
         packet.value = velocity;
 
       return packet; 

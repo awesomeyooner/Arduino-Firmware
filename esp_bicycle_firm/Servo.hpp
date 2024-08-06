@@ -62,10 +62,23 @@ class Servo{
       if(message.device != device)
         return;
 
-      if(message.message_type == MessageType::CONTROL){
-        control_mode = message.type_value;
-        control_value = message.value;
-      }
+      if(message.message_type == MessageType::CONTROL)
+        handle_control(message);
+      else if(message.message_type == MessageType::CONFIG)
+        handle_config(message);
+    }
+
+    void handle_control(Utility::ArduinoMessage message){
+      control_mode = message.type_value;
+      control_value = message.value;
+    }
+
+    void handle_config(Utility::ArduinoMessage message){
+      if(message.type_value == TypeValue::LOWER_BOUND)
+        max_right = message.value;
+      
+      else if(message.type_value == TypeValue::UPPER_BOUND)
+        max_left = message.value;
     }
 
     Utility::ArduinoMessage getPosition(){

@@ -48,8 +48,13 @@ class Motor{
       else if(percent < -1)
         percent = -1;
 
-      uint16_t signal = map(percent * 10000, -10000, 10000, max_reverse, max_forward);
-
+      uint16_t signal = 0;
+      
+      if(percent < 0)
+        signal = map(percent * 10000, -10000, 0, max_reverse, neutral);
+      else if(percent > 0)
+        signal = map(percent * 10000, 0, 10000, neutral, max_forward);
+        
       pwmController->sendSignal(
         channel, 
         signal
@@ -79,6 +84,9 @@ class Motor{
       
       else if(message.type_value == TypeValue::UPPER_BOUND)
         max_forward = message.value;
+
+      else if(message.type_value == TypeValue::NEUTRAL)
+        neutral = message.value;
     }
 
     Utility::ArduinoMessage getPosition(){

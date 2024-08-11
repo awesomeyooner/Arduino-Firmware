@@ -90,8 +90,10 @@ void sendPacket(){
   Utility::ArduinoMessage messages[] = {
     drive_motor.getPosition(), 
     drive_motor.getVelocity(),
+    drive_motor.getEffort(),
 
     steer_motor.getPosition(),
+    steer_motor.getEffort(),
 
     voltage_sensor.getStatus()
   };

@@ -20,6 +20,7 @@ class Motor{
 
     double position;
     double velocity;
+    double effort;
 
     bool inverted;
 
@@ -34,11 +35,13 @@ class Motor{
       this->neutral = neutral;
       this->max_reverse = max_reverse;
 
-      control_mode = TypeValue::PERCENT;
+      control_mode = TypeValue::EFFORT;
       control_value = 0;
 
       position = 0;
       velocity = 0;
+      effort = 0;
+
       inverted = false;
     }
 
@@ -54,13 +57,15 @@ class Motor{
         signal = map(percent * 10000, -10000, 0, max_reverse, neutral);
       else if(percent > 0)
         signal = map(percent * 10000, 0, 10000, neutral, max_forward);
+      else
+        signal = neutral;
         
       pwmController->sendSignal(
         channel, 
         signal
       );      
 
-      velocity = signal;
+      effort = signal;
     }
 
     void apply(Utility::ArduinoMessage message){
@@ -111,6 +116,17 @@ class Motor{
       return packet; 
     }
 
+    Utility::ArduinoMessage getEffort(){
+      Utility::ArduinoMessage packet;
+
+        packet.device = device;
+        packet.message_type = MessageType::STATUS;
+        packet.type_value = TypeValue::EFFORT;
+        packet.value = effort;
+
+      return packet; 
+    }
+
     void update(double position, double velocity){
       this->position = position;
       this->velocity = velocity;
@@ -118,8 +134,6 @@ class Motor{
 
     void update(){
       set_speed(control_value);
-
-      //velocity = control_value;
     }
 
     void off(){

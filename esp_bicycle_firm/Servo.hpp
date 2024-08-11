@@ -20,6 +20,7 @@ class Servo{
 
     double position;
     double velocity;
+    double effort;
 
     bool inverted;
 
@@ -34,11 +35,12 @@ class Servo{
       this->neutral = neutral;
       this->max_right = max_right;
 
-      control_mode = TypeValue::PERCENT;
+      control_mode = TypeValue::EFFORT;
       control_value = 0;
 
       position = 0;
       velocity = 0;
+      effort = 0;
       inverted = false;
     }
 
@@ -48,14 +50,21 @@ class Servo{
       else if(percent < -1)
         percent = -1;
 
-      uint16_t signal = map(percent * 10000, -10000, 10000, max_right, max_left);
+      uint16_t signal = 0;
+
+      if(percent < 0)
+        signal = map(percent * 10000, -10000, 0, max_right, neutral);
+      else if(percent > 0)
+        signal = map(percent * 10000, 0, 10000, neutral, max_left);
+      else
+        signal = neutral;
 
       pwmController->sendSignal(
         channel, 
         signal
       );   
 
-      position = signal;
+      effort = signal;
     }
 
     void apply(Utility::ArduinoMessage message){
@@ -79,6 +88,9 @@ class Servo{
       
       else if(message.type_value == TypeValue::UPPER_BOUND)
         max_left = message.value;
+
+      else if(message.type_value == TypeValue::NEUTRAL)
+        neutral = message.value;
     }
 
     Utility::ArduinoMessage getPosition(){
@@ -103,6 +115,17 @@ class Servo{
       return packet; 
     }
 
+    Utility::ArduinoMessage getEffort(){
+      Utility::ArduinoMessage packet;
+
+        packet.device = device;
+        packet.message_type = MessageType::STATUS;
+        packet.type_value = TypeValue::EFFORT;
+        packet.value = effort;
+
+      return packet; 
+    }
+
     void update(double position, double velocity){
       this->position = position;
       this->velocity = velocity;
@@ -110,8 +133,6 @@ class Servo{
 
     void update(){
       set_angle(control_value);
-
-      //position = control_value;
     }
 
     void off(){

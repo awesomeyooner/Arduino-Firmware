@@ -24,4 +24,10 @@ namespace VoltageSensorConstants{
 
   const int CHANNEL = 1;
 }
+
+namespace HeartbeatConstants{
+  const String DEVICE = "heartbeat";
+
+  const int PIN = 2;
+}
  

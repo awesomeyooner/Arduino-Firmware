@@ -18,6 +18,8 @@ namespace TypeValue{
 
   constexpr char EFFORT[] = "effort";
 
+  constexpr char RAW[] = "raw";
+
   constexpr char VOLTAGE[] = "voltage";
 
   constexpr char LOWER_BOUND[] = "lower_bound";

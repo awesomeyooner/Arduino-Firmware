@@ -6,10 +6,16 @@
 #include "SignalManager.hpp"
 #include "Servo.hpp"
 #include "Constants.hpp"
+#include "HeartbeatManager.hpp"
 
 #define null (char*)NULL
 
 SignalManager signal_manager;
+
+HeartbeatManager heartbeat_manager(
+  HeartbeatConstants::DEVICE,
+  HeartbeatConstants::PIN
+);
 
 Servo steer_motor(
   ServoConstants::DEVICE, 
@@ -40,6 +46,7 @@ void setup() {
   Serial.println("initializing");
 
   signal_manager.init();
+  heartbeat_manager.init();
 
   //fill buffer
   sendPacket();
@@ -53,7 +60,15 @@ void loop() {
   drive_motor.update();
   steer_motor.update();
 
-  voltage_sensor.update(millis());
+  heartbeat_manager.update();
+
+  //voltage_sensor.update(millis());
+
+  if(!heartbeat_manager.is_connected()){
+    drive_motor.off();
+    steer_motor.off();
+  }
+
 }
 
 void recievePacket(){
@@ -81,6 +96,7 @@ void recievePacket(){
 
     drive_motor.apply(message);
     steer_motor.apply(message);
+    heartbeat_manager.apply(message);
   }
   //[{"device":"left_wheel_joint","message_type":"control","type_value":"percent","value":0.0},{"device":"right_wheel_joint","message_type":"control","type_value":"percent","value":0.0}]
 }
@@ -95,7 +111,8 @@ void sendPacket(){
     steer_motor.getPosition(),
     steer_motor.getEffort(),
 
-    voltage_sensor.getStatus()
+    voltage_sensor.getStatus(),
+    heartbeat_manager.getHeartbeat()
   };
   
   JsonDocument send;

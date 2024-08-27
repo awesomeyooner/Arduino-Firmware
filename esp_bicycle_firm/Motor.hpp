@@ -20,6 +20,7 @@ class Motor{
 
     double position;
     double velocity;
+    double effort;
 
     bool inverted;
 
@@ -34,11 +35,13 @@ class Motor{
       this->neutral = neutral;
       this->max_reverse = max_reverse;
 
-      control_mode = ArduinoValue::PERCENT;
+      control_mode = TypeValue::EFFORT;
       control_value = 0;
 
       position = 0;
       velocity = 0;
+      effort = 0;
+
       inverted = false;
     }
 
@@ -48,32 +51,55 @@ class Motor{
       else if(percent < -1)
         percent = -1;
 
-      uint16_t signal = map(percent * 10000, -10000, 10000, max_reverse, max_forward);
-
+      uint16_t signal = 0;
+      
+      if(percent < 0)
+        signal = map(percent * 10000, -10000, 0, max_reverse, neutral);
+      else if(percent > 0)
+        signal = map(percent * 10000, 0, 10000, neutral, max_forward);
+      else
+        signal = neutral;
+        
       pwmController->sendSignal(
         channel, 
         signal
       );      
 
-      velocity = signal;
+      effort = signal;
     }
 
     void apply(Utility::ArduinoMessage message){
       if(message.device != device)
         return;
 
-      if(message.message_type == ArduinoValue::CONTROL){
-        control_mode = message.type_value;
-        control_value = message.value;
-      }
+      if(message.message_type == MessageType::CONTROL)
+        handle_control(message);
+      else if(message.message_type == MessageType::CONFIG)
+        handle_config(message);
+    }
+
+    void handle_control(Utility::ArduinoMessage message){
+      control_mode = message.type_value;
+      control_value = message.value;
+    }
+
+    void handle_config(Utility::ArduinoMessage message){
+      if(message.type_value == TypeValue::LOWER_BOUND)
+        max_reverse = message.value;
+      
+      else if(message.type_value == TypeValue::UPPER_BOUND)
+        max_forward = message.value;
+
+      else if(message.type_value == TypeValue::NEUTRAL)
+        neutral = message.value;
     }
 
     Utility::ArduinoMessage getPosition(){
       Utility::ArduinoMessage packet;
 
         packet.device = device;
-        packet.message_type = ArduinoValue::STATUS;
-        packet.type_value = ArduinoValue::POSITION;
+        packet.message_type = MessageType::STATUS;
+        packet.type_value = TypeValue::POSITION;
         packet.value = position;
 
       return packet; 
@@ -83,9 +109,20 @@ class Motor{
       Utility::ArduinoMessage packet;
 
         packet.device = device;
-        packet.message_type = ArduinoValue::STATUS;
-        packet.type_value = ArduinoValue::VELOCITY;
+        packet.message_type = MessageType::STATUS;
+        packet.type_value = TypeValue::VELOCITY;
         packet.value = velocity;
+
+      return packet; 
+    }
+
+    Utility::ArduinoMessage getEffort(){
+      Utility::ArduinoMessage packet;
+
+        packet.device = device;
+        packet.message_type = MessageType::STATUS;
+        packet.type_value = TypeValue::EFFORT;
+        packet.value = effort;
 
       return packet; 
     }
@@ -97,8 +134,6 @@ class Motor{
 
     void update(){
       set_speed(control_value);
-
-      //velocity = control_value;
     }
 
     void off(){

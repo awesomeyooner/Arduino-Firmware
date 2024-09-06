@@ -6,33 +6,37 @@
 #include "Wire.h"
 #include <string>
 
-class SignalManager{
+namespace managers{
+  
+  class SignalManager{
 
-  private:
-    static SignalManager instance;
+    private:
 
-    PCA9685 pwmController;
+      PCA9685 pwmController;
 
-  public:
+    public:
 
-    SignalManager(){}
+      SignalManager(){}
 
-    static SignalManager getInstance(){
-      return instance;
-    }
+      static SignalManager getInstance(){
+        static SignalManager instance;
 
-    void init(){
-      Wire.begin();
+        return instance;
+      }
 
-      pwmController.resetDevices();
-      pwmController.init();
-      pwmController.setPWMFrequency(60);
-    }
+      void init(){
+        Wire.begin();
 
-    void sendSignal(int channel, uint16_t value){
-      pwmController.setChannelPWM(channel, value);
-    }
+        pwmController.resetDevices();
+        pwmController.init();
+        pwmController.setPWMFrequency(60);
+      }
 
-};
+      void sendSignal(int channel, uint16_t value){
+        pwmController.setChannelPWM(channel, value);
+      }
+
+  };
+}
 
 #endif

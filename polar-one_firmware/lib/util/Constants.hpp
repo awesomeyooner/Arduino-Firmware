@@ -5,6 +5,7 @@
 #include "Sensor.hpp"
 #include "Servo.hpp"
 #include "Motor.hpp"
+#include "Heartbeat.hpp"
 
 namespace MotorConstants{
   const std::string DEVICE = "virtual_rear_wheel_joint";
@@ -45,6 +46,8 @@ namespace HeartbeatConstants{
   const std::string DEVICE = "heartbeat";
 
   const int PIN = 2; //led pin
+
+  const hardware_component::HeartbeatConfig CONFIG = {DEVICE, PIN};  
 }
 
 #endif

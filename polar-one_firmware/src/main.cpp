@@ -8,28 +8,26 @@
 #include "SignalManager.hpp"
 #include "Servo.hpp"
 #include "Constants.hpp"
-#include "heartbeat/HeartbeatManager.hpp"
 #include <string>
-#include "Superstructure.hpp"
+#include "DeviceManager.hpp"
 
 #define null (char*)NULL
 
 //managers
-SignalManager signal_manager;// = SignalManager::getInstance();
-HeartbeatManager heartbeat_manager;// = HeartbeatManager::getInstance();
-
-//subsystems
-subsystem::Superstructure superstructure;// = subsystem::Superstructure::getInstance();
+managers::SignalManager signal_manager;
+managers::DeviceManager device_manager;
 
 void sendPacket();
 void recievePacket();
 
 void setup() {
+//
+  signal_manager = managers::SignalManager::getInstance();
+  
   Serial.begin(115200);
   Serial.println("initializing");
 
   signal_manager.init();
-  heartbeat_manager.init();
 
   //fill buffer
   sendPacket();
@@ -40,14 +38,7 @@ void loop() {
   sendPacket();
   recievePacket();
   
-  superstructure.updateAll();
-
-  heartbeat_manager.update();
-
-  //voltage_sensor.update(millis());
-
-  if(!heartbeat_manager.is_connected())
-    superstructure.drive.stopAll();
+  device_manager.update();
 
 }
 
@@ -74,8 +65,7 @@ void recievePacket(){
       message.type_value = type_value;
       message.value = value;
 
-    superstructure.applyToAll(message);
-    heartbeat_manager.apply(message);
+    device_manager.applyToAll(message);
   }
   //[{"device":"left_wheel_joint","message_type":"control","type_value":"percent","value":0.0},{"device":"right_wheel_joint","message_type":"control","type_value":"percent","value":0.0}]
 }
@@ -86,7 +76,7 @@ void sendPacket(){
 
   JsonArray message_array = send.add<JsonArray>();
 
-  for(ArduinoUtility::ArduinoMessage message : superstructure.getMessagesToSend()){
+  for(ArduinoUtility::ArduinoMessage message : device_manager.getMessagesToSend()){
 
     JsonObject object = message_array.add<JsonObject>(); 
 

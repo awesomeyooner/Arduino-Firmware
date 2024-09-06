@@ -32,7 +32,7 @@ namespace hardware_component{
     private:
       ServoConfig config;
 
-      SignalManager pwmController;// = SignalManager::getInstance();
+      managers::SignalManager pwmController = managers::SignalManager::getInstance();
 
     public:
       

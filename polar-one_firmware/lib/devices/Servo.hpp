@@ -32,7 +32,7 @@ namespace hardware_component{
       int neutral;
       int max_right;
 
-      SignalManager* pwmController;
+      managers::SignalManager pwmController = managers::SignalManager::getInstance();
 
     public:
       ServoConfig config;
@@ -62,7 +62,7 @@ namespace hardware_component{
         else
           signal = neutral;
 
-        pwmController->sendSignal(
+        pwmController.sendSignal(
           channel, 
           signal
         );   

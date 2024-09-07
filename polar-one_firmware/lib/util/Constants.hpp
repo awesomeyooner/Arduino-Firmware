@@ -17,7 +17,7 @@ namespace MotorConstants{
 
   const int CHANNEL = 0;
 
-  //const hardware_component::MotorConfig CONFIG = {DEVICE, CHANNEL, MAX_FORWARD, NEUTRAL, MAX_REVERSE};
+  const hardware_component::MotorConfig CONFIG = {DEVICE, CHANNEL, MAX_FORWARD, NEUTRAL, MAX_REVERSE};
 }
 
 namespace ServoConstants{

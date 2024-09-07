@@ -12,44 +12,44 @@ namespace managers{
 
         private:
 
+                      
+            
+        public:
             std::vector<hardware_component::Device*> devices;
 
             hardware_component::Heartbeat heartbeat_monitor;
 
             hardware_component::Motor drive_motor;
-            hardware_component::Servo steer_motor;            
-            
-        public:
- 
+            hardware_component::Servo steer_motor;  
             DeviceManager() :
                 heartbeat_monitor(HeartbeatConstants::CONFIG),
-                drive_motor(ServoConstants::CONFIG),
+                drive_motor(MotorConstants::CONFIG),
                 steer_motor(ServoConstants::CONFIG){
-                
-                devices.emplace_back(&heartbeat_monitor);
+          
                 devices.emplace_back(&drive_motor);
                 devices.emplace_back(&steer_motor);
+                devices.emplace_back(&heartbeat_monitor);
             }
 
-            static DeviceManager getInstance(){
+            static DeviceManager& getInstance(){
                 static DeviceManager instance;
                 
                 return instance;
             }
 
             std::vector<ArduinoUtility::ArduinoMessage> getMessagesToSend(){
-                std::vector<ArduinoUtility::ArduinoMessage> messages;
-                
-                messages.emplace_back(heartbeat_monitor.getStatus(heartbeat_monitor.beat));
+            
+                return {
+                    heartbeat_monitor.getStatus(heartbeat_monitor.beat),
+                    heartbeat_monitor.getStatus(heartbeat_monitor.delta),
 
-                messages.emplace_back(drive_motor.getStatus(drive_motor.effort));
-                messages.emplace_back(drive_motor.getStatus(drive_motor.position));
-                messages.emplace_back(drive_motor.getStatus(drive_motor.velocity));
+                    drive_motor.getStatus(drive_motor.effort),
+                    //drive_motor.getStatus(drive_motor.position),
+                    //drive_motor.getStatus(drive_motor.velocity),
 
-                messages.emplace_back(steer_motor.getStatus(drive_motor.effort));
-                messages.emplace_back(steer_motor.getStatus(drive_motor.position));
-
-                return messages;
+                    steer_motor.getStatus(steer_motor.effort),
+                    //steer_motor.getStatus(steer_motor.position)
+                };
             }
 
             void applyToAll(ArduinoUtility::ArduinoMessage message){
@@ -59,15 +59,20 @@ namespace managers{
             }
 
             void update(){
-                if(heartbeat_monitor.is_connected()){
+                heartbeat_monitor.update();
+
+                //if(heartbeat_monitor.is_connected()){
                     for(hardware_component::Device* device : devices){
                         device->update();
                     }
-                }
+                // }
 
-                else{
-                    stopAll();
-                }
+                // else{
+                //     stopAll();
+                // }
+
+                // Serial.println("==============");
+                // Serial.println(std::to_string(drive_motor.velocity.value).c_str());
             }
 
             void stopAll(){

@@ -17,8 +17,8 @@ namespace managers{
     public:
 
       SignalManager(){}
-
-      static SignalManager getInstance(){
+      
+      static SignalManager& getInstance(){
         static SignalManager instance;
 
         return instance;

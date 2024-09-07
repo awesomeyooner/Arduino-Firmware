@@ -11,7 +11,7 @@
 #include <string>
 #include "DeviceManager.hpp"
 
-#define null (char*)NULL
+#define null "null"//(char*)NULL
 
 //managers
 managers::SignalManager signal_manager;
@@ -21,8 +21,8 @@ void sendPacket();
 void recievePacket();
 
 void setup() {
-//
   signal_manager = managers::SignalManager::getInstance();
+  device_manager = managers::DeviceManager::getInstance();
   
   Serial.begin(115200);
   Serial.println("initializing");
@@ -39,7 +39,6 @@ void loop() {
   recievePacket();
   
   device_manager.update();
-
 }
 
 void recievePacket(){
@@ -48,10 +47,6 @@ void recievePacket(){
   deserializeJson(recieve, Serial.readStringUntil('\n'));
 
   JsonArray array = recieve.as<JsonArray>();
-
-  // JsonObject object = array[0].as<JsonObject>();
-
-  // voltage_sensor.update(object["value"]);
 
   for(JsonObject object : array){
     ArduinoUtility::ArduinoMessage message;
@@ -67,6 +62,7 @@ void recievePacket(){
 
     device_manager.applyToAll(message);
   }
+  
   //[{"device":"left_wheel_joint","message_type":"control","type_value":"percent","value":0.0},{"device":"right_wheel_joint","message_type":"control","type_value":"percent","value":0.0}]
 }
 
@@ -89,6 +85,6 @@ void sendPacket(){
   serializeJson(send, Serial);
   Serial.print('\n');
   
-} //end of method
+}
 
 

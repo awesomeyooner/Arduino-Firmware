@@ -9,33 +9,33 @@
 
 namespace hardware_component{
 
-  struct MotorConfig{
+  // struct MotorConfig{
 
-      std::string device;
-      int channel;
-      int max_forward;
-      int neutral;
-      int max_reverse;
+  //     std::string device;
+  //     int channel;
+  //     int max_forward;
+  //     int neutral;
+  //     int max_reverse;
 
-      MotorConfig(std::string device, int channel, int max_forward, int neutral, int max_reverse) : 
-        device(device), 
-        channel(channel), 
-        max_forward(max_forward),
-        neutral(neutral),
-        max_reverse(max_reverse){}
+  //     MotorConfig(std::string device, int channel, int max_forward, int neutral, int max_reverse) : 
+  //       device(device), 
+  //       channel(channel), 
+  //       max_forward(max_forward),
+  //       neutral(neutral),
+  //       max_reverse(max_reverse){}
 
-      MotorConfig(){}
-  };
+  //     MotorConfig(){}
+  // };
 
   class Motor : public Device{
 
     private:
-      ServoConfig config;
-
+      
       managers::SignalManager pwmController = managers::SignalManager::getInstance();
 
     public:
-      
+      MotorConfig config;
+
       hardware_component::InterfaceValue command = {MotorConstants::COMMAND_INTERFACE};
 
       hardware_component::InterfaceValue position = {TypeValue::POSITION};
@@ -44,7 +44,7 @@ namespace hardware_component{
 
       bool inverted;
 
-      Motor(ServoConfig config) : Device(config.device){
+      Motor(MotorConfig config) : Device(config.device){
         this->config = config;
       }
 
@@ -57,9 +57,9 @@ namespace hardware_component{
         uint16_t signal = 0;
         
         if(percent < 0)
-          signal = map(percent * 10000, -10000, 0, config.max_left, config.neutral);
+          signal = map(percent * 10000, -10000, 0, config.max_reverse, config.neutral);
         else if(percent > 0)
-          signal = map(percent * 10000, 0, 10000, config.neutral, config.max_left);
+          signal = map(percent * 10000, 0, 10000, config.neutral, config.max_forward);
         else
           signal = config.neutral;
           
@@ -87,10 +87,10 @@ namespace hardware_component{
 
       void handle_config(ArduinoUtility::ArduinoMessage message){
         if(message.type_value == TypeValue::LOWER_BOUND)
-          config.max_left = message.value;
+          config.max_reverse = message.value;
         
         else if(message.type_value == TypeValue::UPPER_BOUND)
-          config.max_left = message.value;
+          config.max_forward = message.value;
 
         else if(message.type_value == TypeValue::NEUTRAL)
           config.neutral = message.value;

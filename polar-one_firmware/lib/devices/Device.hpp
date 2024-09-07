@@ -8,6 +8,24 @@
 
 namespace hardware_component{
 
+  struct MotorConfig{
+
+      std::string device;
+      int channel;
+      int max_forward;
+      int neutral;
+      int max_reverse;
+
+      MotorConfig(std::string device, int channel, int max_forward, int neutral, int max_reverse) : 
+        device(device), 
+        channel(channel), 
+        max_forward(max_forward),
+        neutral(neutral),
+        max_reverse(max_reverse){}
+
+      MotorConfig(){}
+  };
+
   class Device{
 
     public:

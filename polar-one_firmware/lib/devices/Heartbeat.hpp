@@ -24,13 +24,14 @@ namespace hardware_component{
         HeartbeatConfig config;
         
         
-        int last_message = 0;
+        double last_message = 0;
 
         bool is_alive = false;
 
     public:
 
       hardware_component::InterfaceValue beat = {TypeValue::RAW};
+      hardware_component::InterfaceValue delta = {"delta"};
 
       Heartbeat(HeartbeatConfig config) : Device(config.device){
         this->config = config;
@@ -53,6 +54,8 @@ namespace hardware_component{
       void update(){
         beat.value = millis();
 
+        delta.value = last_message;
+        
         is_alive = abs(last_message - beat.value) < 500;
 
         if(is_alive)
@@ -65,7 +68,9 @@ namespace hardware_component{
         if(message.device != device)
           return;
 
-        last_message = (int)message.value;
+        last_message = message.value;
+
+        turn_on();
       }
 
       ArduinoUtility::ArduinoMessage getStatus(hardware_component::InterfaceValue status){

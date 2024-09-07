@@ -31,7 +31,6 @@ namespace hardware_component{
     public:
 
       hardware_component::InterfaceValue beat = {TypeValue::RAW};
-      hardware_component::InterfaceValue delta = {"delta"};
 
       Heartbeat(HeartbeatConfig config) : Device(config.device){
         this->config = config;
@@ -54,9 +53,7 @@ namespace hardware_component{
       void update(){
         beat.value = millis();
 
-        delta.value = last_message;
-        
-        is_alive = abs(last_message - beat.value) < 500;
+        is_alive = abs(last_message - beat.value) < 150;
 
         if(is_alive)
           turn_on();
@@ -83,6 +80,8 @@ namespace hardware_component{
       }
 
       bool is_connected(){
+        update();
+
         return is_alive;
       }
 

@@ -14,8 +14,8 @@
 #define null "null"//(char*)NULL
 
 //managers
-managers::SignalManager signal_manager;
-managers::DeviceManager device_manager;
+managers::SignalManager* signal_manager;
+managers::DeviceManager* device_manager;
 
 void sendPacket();
 void recievePacket();
@@ -27,7 +27,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("initializing");
 
-  signal_manager.init();
+  signal_manager->init();
 
   //fill buffer
   sendPacket();
@@ -35,12 +35,9 @@ void setup() {
 }
 
 void loop() {
-  managers::SignalManager::getInstance().sendSignal(1, 260);
-
-  // sendPacket();
-  // recievePacket();
-  
-  // device_manager.update();
+  sendPacket();
+  recievePacket();
+  device_manager->update();
 }
 
 void recievePacket(){
@@ -62,7 +59,7 @@ void recievePacket(){
       message.type_value = type_value;
       message.value = value;
 
-    device_manager.applyToAll(message);
+    device_manager->applyToAll(message);
   }
   
   //[{"device":"left_wheel_joint","message_type":"control","type_value":"percent","value":0.0},{"device":"right_wheel_joint","message_type":"control","type_value":"percent","value":0.0}]
@@ -74,7 +71,7 @@ void sendPacket(){
 
   JsonArray message_array = send.add<JsonArray>();
 
-  for(ArduinoUtility::ArduinoMessage message : device_manager.getMessagesToSend()){
+  for(ArduinoUtility::ArduinoMessage message : device_manager->getMessagesToSend()){
 
     JsonObject object = message_array.add<JsonObject>(); 
 

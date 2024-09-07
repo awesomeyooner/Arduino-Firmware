@@ -31,7 +31,7 @@ namespace hardware_component{
 
     private:
       
-      managers::SignalManager pwmController = managers::SignalManager::getInstance();
+      managers::SignalManager* pwmController = managers::SignalManager::getInstance();
 
     public:
       MotorConfig config;
@@ -63,7 +63,7 @@ namespace hardware_component{
         else
           signal = config.neutral;
           
-        pwmController.sendSignal(
+        pwmController->sendSignal(
           config.channel, 
           signal
         );      

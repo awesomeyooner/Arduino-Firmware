@@ -10,17 +10,18 @@ namespace managers{
 
     class DeviceManager{
 
-        private:
-
-                      
+        private:     
             
         public:
+            static DeviceManager instance;
+
             std::vector<hardware_component::Device*> devices;
 
             hardware_component::Heartbeat heartbeat_monitor;
 
             hardware_component::Motor drive_motor;
             hardware_component::Servo steer_motor;  
+
             DeviceManager() :
                 heartbeat_monitor(HeartbeatConstants::CONFIG),
                 drive_motor(MotorConstants::CONFIG),
@@ -31,24 +32,19 @@ namespace managers{
                 devices.emplace_back(&heartbeat_monitor);
             }
 
-            static DeviceManager& getInstance(){
-                static DeviceManager instance;
-                
-                return instance;
-            }
+            static DeviceManager* getInstance();
 
             std::vector<ArduinoUtility::ArduinoMessage> getMessagesToSend(){
             
                 return {
                     heartbeat_monitor.getStatus(heartbeat_monitor.beat),
-                    heartbeat_monitor.getStatus(heartbeat_monitor.delta),
 
                     drive_motor.getStatus(drive_motor.effort),
-                    drive_motor.getStatus(drive_motor.position),
-                    drive_motor.getStatus(drive_motor.velocity),
+                    //drive_motor.getStatus(drive_motor.position),
+                    //drive_motor.getStatus(drive_motor.velocity),
 
                     steer_motor.getStatus(steer_motor.effort),
-                    steer_motor.getStatus(steer_motor.position)
+                    //steer_motor.getStatus(steer_motor.position)
                 };
             }
 
@@ -62,23 +58,26 @@ namespace managers{
             }
 
             void update(){
-                heartbeat_monitor.update();
+                // heartbeat_monitor.update();
 
-                drive_motor.update();
-                steer_motor.update();
+                // drive_motor.update();
+                // steer_motor.update();
 
-                // if(heartbeat_monitor.is_connected()){
-                //     for(hardware_component::Device* device : devices){
-                //         device->update();
-                //     }
-                // }
+                if(heartbeat_monitor.is_connected()){
+                    for(hardware_component::Device* device : devices){
+                        device->update();
+                    }
+                }
 
-                // else{
-                //     stopAll();
-                // }
+                else{
+                    stopAll();
+                }
+
+
 
                 // Serial.println("==============");
                 // Serial.println(std::to_string(drive_motor.velocity.value).c_str());
+
             }
 
             void stopAll(){
@@ -86,6 +85,12 @@ namespace managers{
                 steer_motor.off();
             }
     };
+
+    managers::DeviceManager managers::DeviceManager::instance;
+
+    managers::DeviceManager* managers::DeviceManager::getInstance(){
+        return &instance;
+    }
 }
 
 #endif

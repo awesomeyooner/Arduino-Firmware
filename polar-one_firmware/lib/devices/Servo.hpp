@@ -27,12 +27,8 @@ namespace hardware_component{
 
   class Servo : public Device{
     private:
-      int channel;
-      int max_left;
-      int neutral;
-      int max_right;
 
-      managers::SignalManager pwmController = managers::SignalManager::getInstance();
+      managers::SignalManager* pwmController = managers::SignalManager::getInstance();
 
     public:
       ServoConfig config;
@@ -56,14 +52,14 @@ namespace hardware_component{
         uint16_t signal = 0;
 
         if(percent < 0)
-          signal = map(percent * 10000, -10000, 0, max_right, neutral);
+          signal = map(percent * 10000, -10000, 0, config.max_right, config.neutral);
         else if(percent > 0)
-          signal = map(percent * 10000, 0, 10000, neutral, max_left);
+          signal = map(percent * 10000, 0, 10000, config.neutral, config.max_left);
         else
-          signal = neutral;
+          signal = config.neutral;
 
-        pwmController.sendSignal(
-          channel, 
+        pwmController->sendSignal(
+          config.channel, 
           signal
         );   
 
@@ -86,13 +82,13 @@ namespace hardware_component{
 
       void handle_config(ArduinoUtility::ArduinoMessage message){
         if(message.type_value == TypeValue::LOWER_BOUND)
-          max_right = message.value;
+          config.max_right = message.value;
         
         else if(message.type_value == TypeValue::UPPER_BOUND)
-          max_left = message.value;
+          config.max_left = message.value;
 
         else if(message.type_value == TypeValue::NEUTRAL)
-          neutral = message.value;
+          config.neutral = message.value;
       }
 
       ArduinoUtility::ArduinoMessage getStatus(hardware_component::InterfaceValue status) override{

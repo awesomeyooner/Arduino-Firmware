@@ -20,7 +20,7 @@ namespace managers{
 
       SignalManager(){}
       
-      static SignalManager& getInstance();
+      static SignalManager* getInstance();
 
       void init(){
         Wire.begin();
@@ -38,8 +38,8 @@ namespace managers{
   
   managers::SignalManager managers::SignalManager::instance;
 
-  managers::SignalManager& managers::SignalManager::getInstance(){
-    return instance;
+  managers::SignalManager* managers::SignalManager::getInstance(){
+    return &instance;
   }
 }
 

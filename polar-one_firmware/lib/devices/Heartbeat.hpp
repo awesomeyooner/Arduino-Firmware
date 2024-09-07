@@ -69,8 +69,6 @@ namespace hardware_component{
           return;
 
         last_message = message.value;
-
-        turn_on();
       }
 
       ArduinoUtility::ArduinoMessage getStatus(hardware_component::InterfaceValue status){

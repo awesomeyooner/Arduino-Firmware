@@ -24,31 +24,32 @@ namespace hardware_component{
 }
 
 namespace MessageType{
-  constexpr char STATUS[] = "status";
 
-  constexpr char CONTROL[] = "control";
+  const std::string STATUS = "status";
 
-  constexpr char CONFIG[] = "config";
+  const std::string CONTROL = "control";
 
-  constexpr char UNCONFIGURED[] = "unconfigured";
+  const std::string CONFIG = "config";
+
+  const std::string UNCONFIGURED = "unconfigured";
 }
 
 namespace TypeValue{
-  constexpr char VELOCITY[] = "velocity";
+  const std::string VELOCITY = "velocity";
 
-  constexpr char POSITION[] = "position";
+  const std::string POSITION = "position";
 
-  constexpr char EFFORT[] = "effort";
+  const std::string EFFORT = "effort";
 
-  constexpr char VOLTAGE[] = "voltage";
+  const std::string VOLTAGE = "voltage";
 
-  constexpr char RAW[] = "raw";
+  const std::string RAW = "raw";
 
-  constexpr char LOWER_BOUND[] = "lower_bound";
+  const std::string LOWER_BOUND = "lower_bound";
 
-  constexpr char NEUTRAL[] = "neutral";
+  const std::string NEUTRAL = "neutral";
 
-  constexpr char UPPER_BOUND[] = "upper_bound";
+  const std::string UPPER_BOUND = "upper_bound";
 }
 
 #endif  // ARDUINO_INTERFACE__TYPES__ARDUINO_INTERFACE_TYPES_HPP_

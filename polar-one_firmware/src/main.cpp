@@ -35,10 +35,12 @@ void setup() {
 }
 
 void loop() {
-  sendPacket();
-  recievePacket();
+  managers::SignalManager::getInstance().sendSignal(1, 260);
+
+  // sendPacket();
+  // recievePacket();
   
-  device_manager.update();
+  // device_manager.update();
 }
 
 void recievePacket(){

@@ -7,7 +7,7 @@
 #include <string>
 
 namespace managers{
-  
+
   class SignalManager{
 
     private:
@@ -16,13 +16,11 @@ namespace managers{
 
     public:
 
+      static SignalManager instance;
+
       SignalManager(){}
       
-      static SignalManager& getInstance(){
-        static SignalManager instance;
-
-        return instance;
-      }
+      static SignalManager& getInstance();
 
       void init(){
         Wire.begin();
@@ -37,6 +35,12 @@ namespace managers{
       }
 
   };
+  
+  managers::SignalManager managers::SignalManager::instance;
+
+  managers::SignalManager& managers::SignalManager::getInstance(){
+    return instance;
+  }
 }
 
 #endif

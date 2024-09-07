@@ -44,11 +44,11 @@ namespace managers{
                     heartbeat_monitor.getStatus(heartbeat_monitor.delta),
 
                     drive_motor.getStatus(drive_motor.effort),
-                    //drive_motor.getStatus(drive_motor.position),
-                    //drive_motor.getStatus(drive_motor.velocity),
+                    drive_motor.getStatus(drive_motor.position),
+                    drive_motor.getStatus(drive_motor.velocity),
 
                     steer_motor.getStatus(steer_motor.effort),
-                    //steer_motor.getStatus(steer_motor.position)
+                    steer_motor.getStatus(steer_motor.position)
                 };
             }
 
@@ -56,15 +56,21 @@ namespace managers{
                 for(hardware_component::Device* device : devices){
                     device->apply(message);
                 }
+
+                drive_motor.apply(message);
+                steer_motor.apply(message);
             }
 
             void update(){
                 heartbeat_monitor.update();
 
-                //if(heartbeat_monitor.is_connected()){
-                    for(hardware_component::Device* device : devices){
-                        device->update();
-                    }
+                drive_motor.update();
+                steer_motor.update();
+
+                // if(heartbeat_monitor.is_connected()){
+                //     for(hardware_component::Device* device : devices){
+                //         device->update();
+                //     }
                 // }
 
                 // else{

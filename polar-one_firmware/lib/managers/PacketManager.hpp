@@ -1,81 +1,87 @@
-// #ifndef PACKETMANAGER_PACKETMANAGER_HPP
-// #define PACKETMANAGER_PACKETMANAGER_HPP
+#ifndef PACKETMANAGER_PACKETMANAGER_HPP
+#define PACKETMANAGER_PACKETMANAGER_HPP
 
-// #include "utils.hpp"
-// #include <ArduinoJson.h>
-// #include <ArduinoJson.hpp>
-// #include <string>
+#include "utils.hpp"
+#include "DeviceManager.hpp"
+#include <ArduinoJson.h>
+#include <ArduinoJson.hpp>
+#include <string>
 
-// class SignalManager{
+#define null "null"//(char*)NULL
 
-//   private:
-    
+namespace managers{
 
-//   public:
 
-//     PacketManager(){
-//     }
+    class PacketManager{
 
-//     void init(){
+        private:
+            managers::DeviceManager* device_manager;
 
-//     }
+        public:
 
-//     void recievePacket(){
-//       JsonDocument recieve;
-      
-//       deserializeJson(recieve, Serial.readstd::stringUntil('\n'));
+            static PacketManager instance;
 
-//       JsonArray array = recieve.as<JsonArray>();
+            PacketManager() : device_manager(managers::DeviceManager::getInstance()){}
 
-//       // JsonObject object = array[0].as<JsonObject>();
+            static PacketManager* getInstance();
 
-//       // voltage_sensor.update(object["value"]);
+            void update(){
+                sendPacket();
+                recievePacket();
+                device_manager->update();
+            }
 
-//       for(JsonObject object : array){
-//         ArduinoUtility::ArduinoMessage message;
-//           std::string device = object["device"];
-//           std::string message_type = object["message_type"];
-//           std::string type_value = object["type_value"];
-//           double value = object["value"];
+            void recievePacket(){
+                JsonDocument recieve;
+                
+                deserializeJson(recieve, Serial.readStringUntil('\n'));
 
-//           message.device = device;
-//           message.message_type = message_type;
-//           message.type_value = type_value;
-//           message.value = value;
+                JsonArray array = recieve.as<JsonArray>();
 
-//         drive_motor.apply(message);
-//         steer_motor.apply(message);
-//       }
-//       //[{"device":"left_wheel_joint","message_type":"control","type_value":"percent","value":0.0},{"device":"right_wheel_joint","message_type":"control","type_value":"percent","value":0.0}]
-//     }
+                for(JsonObject object : array){
+                    ArduinoUtility::ArduinoMessage message;
 
-//     void sendPacket(){
-    
-//       ArduinoUtility::ArduinoMessage messages[] = {
-//         drive_motor.getPosition(), drive_motor.getVelocity(),
-//         steer_motor.getPosition(),
-//         voltage_sensor.getStatus()
-//       };
-      
-//       JsonDocument send;
+                    std::string device = object["device"];
+                    std::string message_type = object["message_type"];
+                    std::string type_value = object["type_value"];
+                    double value = object["value"];
 
-//       JsonArray message_array = send.add<JsonArray>();
+                    message.device = device;
+                    message.message_type = message_type;
+                    message.type_value = type_value;
+                    message.value = value;
 
-//       for(ArduinoUtility::ArduinoMessage message : messages){
+                    device_manager->applyToAll(message);
+                }
+            }
 
-//         JsonObject object = message_array.add<JsonObject>(); 
+            void sendPacket(){
+            
+                JsonDocument send;
 
-//         object["device"] = message.device == NULL ? null : message.device;
-//         object["message_type"] = message.message_type == NULL ? null : message.message_type;
-//         object["type_value"] = message.type_value == NULL ? null : message.type_value;
-//         object["value"] = message.value;
-//       }
-      
-//       serializeJson(send, Serial);
-//       Serial.print('\n');
-      
-//     } //end of method
+                JsonArray message_array = send.add<JsonArray>();
 
-// };
+                for(ArduinoUtility::ArduinoMessage message : device_manager->getMessagesToSend()){
 
-// #endif
+                    JsonObject object = message_array.add<JsonObject>(); 
+
+                    object["device"] = message.device.empty() ? null : message.device;
+                    object["message_type"] = message.message_type.empty() ? null : message.message_type;
+                    object["type_value"] = message.type_value.empty() ? null : message.type_value;
+                    object["value"] = message.value;
+                }
+                
+                serializeJson(send, Serial);
+                Serial.print('\n');
+            
+            }
+    };
+
+    managers::PacketManager managers::PacketManager::instance;
+
+    managers::PacketManager* managers::PacketManager::getInstance(){
+        return &instance;
+    }    
+}
+
+#endif

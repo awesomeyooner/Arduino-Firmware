@@ -11,9 +11,10 @@ namespace hardware_component{
     struct HeartbeatConfig{
         std::string device;
         int pin;
+        int max_latency;
 
-        HeartbeatConfig(std::string device, int pin) : device(device), pin(pin){}
-        HeartbeatConfig(std::string device) : device(device), pin(0){}
+        HeartbeatConfig(std::string device, int pin, int max_latency) : device(device), pin(pin), max_latency(max_latency){}
+        HeartbeatConfig(std::string device) : device(device), pin(0), max_latency(100){}
         HeartbeatConfig(){}
   };
 
@@ -22,7 +23,6 @@ namespace hardware_component{
     private:
 
         HeartbeatConfig config;
-        
         
         double last_message = 0;
 
@@ -53,7 +53,7 @@ namespace hardware_component{
       void update(){
         beat.value = millis();
 
-        is_alive = abs(last_message - beat.value) < 150;
+        is_alive = abs(last_message - beat.value) < config.max_latency;
 
         if(is_alive)
           turn_on();

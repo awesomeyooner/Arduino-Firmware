@@ -58,11 +58,7 @@ namespace managers{
             }
 
             void update(){
-                // heartbeat_monitor.update();
-
-                // drive_motor.update();
-                // steer_motor.update();
-
+    
                 if(heartbeat_monitor.is_connected()){
                     for(hardware_component::Device* device : devices){
                         device->update();
@@ -72,12 +68,6 @@ namespace managers{
                 else{
                     stopAll();
                 }
-
-
-
-                // Serial.println("==============");
-                // Serial.println(std::to_string(drive_motor.velocity.value).c_str());
-
             }
 
             void stopAll(){

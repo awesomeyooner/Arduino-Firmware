@@ -47,7 +47,9 @@ namespace HeartbeatConstants{
 
   const int PIN = 2; //led pin
 
-  const hardware_component::HeartbeatConfig CONFIG = {DEVICE, PIN};  
+  const int MAX_LATENCY = 150;
+
+  const hardware_component::HeartbeatConfig CONFIG = {DEVICE, PIN, MAX_LATENCY};  
 }
 
 #endif

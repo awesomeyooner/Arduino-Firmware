@@ -36,7 +36,7 @@ namespace hardware_component{
                     previousPosition.timestamp = time;
                     position.timestamp = time;
                     velocity.timestamp = time;
-                }
+            }
 
             Encoder(EncoderID id) : 
                 channelA(id.channelA),
@@ -47,7 +47,7 @@ namespace hardware_component{
                     previousPosition.timestamp = time;
                     position.timestamp = time;
                     velocity.timestamp = time;
-                }
+            }
 
             virtual void initialize(){
                 pinMode(channelA, INPUT_PULLDOWN);

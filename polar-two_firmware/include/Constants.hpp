@@ -33,8 +33,8 @@ namespace MotorConstants{
     };
 
     const hardware_component::MotorID RIGHT_MOTOR_ID = {
-        .inputPin1 = 3,
-        .inputPin2 = 4,
+        .inputPin1 = 14,
+        .inputPin2 = 27,
         .channel1 = 2,
         .channel2 = 3
     };
@@ -50,8 +50,8 @@ namespace MotorConstants{
     };
 
     const hardware_component::EncoderID RIGHT_FRONT_ENCODER_ID = {
-        .channelA = 23,
-        .channelB = 22
+        .channelA = 19,
+        .channelB = 18
     };
 
     const hardware_component::EncoderID RIGHT_BACK_ENCODER_ID = {

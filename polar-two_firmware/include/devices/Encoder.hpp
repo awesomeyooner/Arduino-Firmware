@@ -8,6 +8,7 @@
 #include "../util/Utility.hpp"
 #include <map>
 #include "esp_timer.h"
+#include <FunctionalInterrupt.h>
 
 namespace hardware_component{
 
@@ -19,16 +20,41 @@ namespace hardware_component{
             Utility::TimestampedNumber previousPosition;
             Utility::TimestampedNumber positionRaw;
 
-            static std::map<int, Encoder*> pinToEncoderMap; //gives proper pointer given pin
+        public:
+            double pulsesPerRevolution = 1.0;
+            double sensorToMechanismRatio = 1.0;
 
-            static int temporaryA, temporaryB;
+            Utility::TimestampedNumber position;
+            Utility::TimestampedNumber velocity;
 
-            static void handleInterruptA(){
-                pinToEncoderMap[temporaryA]->handleA();
-            }
+            Encoder(int channelA, int channelB) : 
+                channelA(channelA),
+                channelB(channelB){
+    
+                    //set default values for position and velocity so that it doesn't freak out initially
+                    double time = esp_timer_get_time() / 1000000;
+                    previousPosition.timestamp = time;
+                    position.timestamp = time;
+                    velocity.timestamp = time;
+                }
 
-            static void handleInterruptB(){
-                pinToEncoderMap[temporaryB]->handleB();
+            Encoder(EncoderID id) : 
+                channelA(id.channelA),
+                channelB(id.channelB){
+    
+                    //set default values for position and velocity so that it doesn't freak out initially
+                    double time = (double)esp_timer_get_time() / 1000000.0;
+                    previousPosition.timestamp = time;
+                    position.timestamp = time;
+                    velocity.timestamp = time;
+                }
+
+            virtual void initialize(){
+                pinMode(channelA, INPUT_PULLDOWN);
+                pinMode(channelB, INPUT_PULLDOWN);
+
+                attachInterrupt(digitalPinToInterrupt(channelA), [this](){handleA();}, CHANGE);
+                attachInterrupt(digitalPinToInterrupt(channelB), [this](){handleB();}, CHANGE);
             }
 
             void handleA(){
@@ -63,53 +89,6 @@ namespace hardware_component{
                 }
             }
 
-        public:
-            double pulsesPerRevolution = 1.0;
-            double sensorToMechanismRatio = 1.0;
-
-            Utility::TimestampedNumber position;
-            Utility::TimestampedNumber velocity;
-
-            Encoder(int channelA, int channelB) : 
-                channelA(channelA),
-                channelB(channelB){
-    
-                    pinToEncoderMap[channelA] = this;
-                    pinToEncoderMap[channelB] = this;
-
-                    //set default values for position and velocity so that it doesn't freak out initially
-                    double time = esp_timer_get_time() / 1000000;
-                    previousPosition.timestamp = time;
-                    position.timestamp = time;
-                    velocity.timestamp = time;
-                }
-
-            Encoder(EncoderID id) : 
-                channelA(id.channelA),
-                channelB(id.channelB){
-    
-                    pinToEncoderMap[channelA] = this;
-                    pinToEncoderMap[channelB] = this;
-
-                    //set default values for position and velocity so that it doesn't freak out initially
-                    double time = (double)esp_timer_get_time() / 1000000.0;
-                    previousPosition.timestamp = time;
-                    position.timestamp = time;
-                    velocity.timestamp = time;
-                }
-
-            virtual void initialize(){
-
-                temporaryA = channelA;
-                temporaryB = channelB;
-
-                pinMode(channelA, INPUT_PULLDOWN);
-                pinMode(channelB, INPUT_PULLDOWN);
-
-                attachInterrupt(digitalPinToInterrupt(channelA), handleInterruptA, CHANGE);
-                attachInterrupt(digitalPinToInterrupt(channelB), handleInterruptB, CHANGE);
-            }
-
             /**
              * this NEEDS some sort of delay for it to work properly
              */
@@ -130,11 +109,6 @@ namespace hardware_component{
             }
   
     };
-
-    //declare static variables
-    std::map<int, Encoder*> Encoder::pinToEncoderMap;
-    int Encoder::temporaryA = 0;
-    int Encoder::temporaryB = 0;
 }
 
 #endif

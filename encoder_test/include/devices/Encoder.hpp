@@ -7,6 +7,7 @@
 #include <Arduino.h>
 #include "../util/Utility.hpp"
 #include <map>
+#include <FunctionalInterrupt.h>
 #include "esp_timer.h"
 
 namespace hardware_component{
@@ -19,19 +20,33 @@ namespace hardware_component{
             Utility::TimestampedNumber previousPosition;
             Utility::TimestampedNumber positionRaw;
 
-            static std::map<int, Encoder*> pinToEncoderMap; //gives proper pointer given pin
+        public:
+            double pulsesPerRevolution = 1.0;
+            double sensorToMechanismRatio = 1.0;
 
-            static int temporaryA, temporaryB;
+            Utility::TimestampedNumber position;
+            Utility::TimestampedNumber velocity;
 
-            static void handleInterruptA(){
-                pinToEncoderMap[temporaryA]->handleA();
+            Encoder(int channelA, int channelB) : 
+                channelA(channelA),
+                channelB(channelB){
+                    //set default values for position and velocity so that it doesn't freak out initially
+                    double time = esp_timer_get_time() / 1000000;
+                    previousPosition.timestamp = time;
+                    position.timestamp = time;
+                    velocity.timestamp = time;
             }
 
-            static void handleInterruptB(){
-                pinToEncoderMap[temporaryB]->handleB();
+            virtual void initialize(){
+                pinMode(channelA, INPUT_PULLDOWN);
+                pinMode(channelB, INPUT_PULLDOWN);
+
+                attachInterrupt(digitalPinToInterrupt(channelA), [this]() {handleA();}, CHANGE);
+                attachInterrupt(digitalPinToInterrupt(channelB), [this]() {handleB();}, CHANGE);
             }
 
             void handleA(){
+
                 if(digitalRead(channelA) == HIGH){
                     if(digitalRead(channelB) == LOW)
                         positionRaw.value += 1;
@@ -48,6 +63,7 @@ namespace hardware_component{
             }
 
             void handleB(){
+                
                 if(digitalRead(channelB) == HIGH){
                     if(digitalRead(channelA) == HIGH)
                         positionRaw.value += 1;
@@ -62,40 +78,6 @@ namespace hardware_component{
                         positionRaw.value -= 1;
                 }
             }
-
-        public:
-            double pulsesPerRevolution = 1.0;
-            double sensorToMechanismRatio = 1.0;
-
-            Utility::TimestampedNumber position;
-            Utility::TimestampedNumber velocity;
-
-            Encoder(int channelA, int channelB) : 
-                channelA(channelA),
-                channelB(channelB){
-    
-                    pinToEncoderMap[channelA] = this;
-                    pinToEncoderMap[channelB] = this;
-
-                    //set default values for position and velocity so that it doesn't freak out initially
-                    double time = esp_timer_get_time() / 1000000;
-                    previousPosition.timestamp = time;
-                    position.timestamp = time;
-                    velocity.timestamp = time;
-                }
-
-            virtual void initialize(){
-
-                temporaryA = channelA;
-                temporaryB = channelB;
-
-                pinMode(channelA, INPUT_PULLDOWN);
-                pinMode(channelB, INPUT_PULLDOWN);
-
-                attachInterrupt(digitalPinToInterrupt(channelA), handleInterruptA, CHANGE);
-                attachInterrupt(digitalPinToInterrupt(channelB), handleInterruptB, CHANGE);
-            }
-
             /**
              * this NEEDS some sort of delay for it to work properly
              */
@@ -113,17 +95,9 @@ namespace hardware_component{
                 velocity.timestamp = time;
 
                 previousPosition = positionRaw;
-
-                Serial.println(velocity.value);
-                delay(20);
             }
   
     };
-
-    //declare static variables
-    std::map<int, Encoder*> Encoder::pinToEncoderMap;
-    int Encoder::temporaryA = 0;
-    int Encoder::temporaryB = 0;
 }
 
 #endif

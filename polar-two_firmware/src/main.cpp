@@ -46,9 +46,9 @@ void leftSubscriberCallback(const void * msgin){
   hardwareManager.leftWheel.subscriberCallback(msgin);
 }
 
-// void rightSubscriberCallback(const void * msgin){
-//   hardwareManager->rightWheel.subscriberCallback(msgin);
-// }
+void rightSubscriberCallback(const void * msgin){
+  hardwareManager.rightWheel.subscriberCallback(msgin);
+}
 
 void setup() {
 
@@ -87,13 +87,13 @@ void setup() {
     ON_NEW_DATA
   ));
 
-  // RCCHECK(rclc_executor_add_subscription(
-  //   &executor, 
-  //   &hardwareManager->rightWheel.commandSubscriber, 
-  //   &hardwareManager->rightWheel.commandMessage, 
-  //   &rightSubscriberCallback, 
-  //   ON_NEW_DATA
-  // ));
+  RCCHECK(rclc_executor_add_subscription(
+    &executor, 
+    &hardwareManager.rightWheel.commandSubscriber, 
+    &hardwareManager.rightWheel.commandMessage, 
+    &rightSubscriberCallback, 
+    ON_NEW_DATA
+  ));
 }
 
 void loop() {

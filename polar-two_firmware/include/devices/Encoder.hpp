@@ -11,11 +11,6 @@
 
 namespace hardware_component{
 
-    struct EncoderID{
-        int channelA;
-        int channelB;
-    };
-
     class Encoder{
 
         private:

@@ -1,14 +1,21 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
-#include "devices/Encoder.hpp"
-#include "devices/Motor.hpp"
+namespace hardware_component{
+    struct MotorID{
+        int inputPin1, inputPin2;
+        int channel1, channel2;
+    };
+
+    struct EncoderID{
+        int channelA;
+        int channelB;
+    };
+}
 
 namespace GeneralConstants{
     const int PWM_HERTZ = 100000;
     const int PWM_RESOLUTION = 8; //bits
-
-
 }
 
 namespace MotorConstants{

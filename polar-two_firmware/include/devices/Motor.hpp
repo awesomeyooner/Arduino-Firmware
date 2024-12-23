@@ -8,11 +8,6 @@
 
 namespace hardware_component{
 
-    struct MotorID{
-        int inputPin1, inputPin2;
-        int channel1, channel2;
-    };
-
     class Motor{
 
         private:

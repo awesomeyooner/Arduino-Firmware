@@ -18,7 +18,7 @@ namespace hardware_component{
 
             bool inverted = false;
             bool isBrake = false;
-            double controlPercent = 0;
+            double command = 0;
 
             Motor(int inputPin1, int inputPin2, int channel1, int channel2) :  
                 inputPin1(inputPin1), 
@@ -43,7 +43,7 @@ namespace hardware_component{
             }
 
             virtual void update(){
-
+                setSpeed(command);
             }
 
             virtual void off(){

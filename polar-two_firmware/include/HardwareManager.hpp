@@ -12,40 +12,32 @@ namespace hardware_component{
         private:
         
         public:
-            static HardwareManager instance;
-
-            static HardwareManager* getInstance();
 
             MotorController leftWheel;
-            MotorController rightWheel;
+            //MotorController rightWheel;
 
             HardwareManager() : 
-            leftWheel("left_motor", MotorConstants::LEFT_MOTOR_ID, MotorConstants::LEFT_FRONT_ENCODER_ID),
-            rightWheel("right_motor", MotorConstants::RIGHT_MOTOR_ID, MotorConstants::RIGHT_FRONT_ENCODER_ID){}
+            leftWheel("left_motor", MotorConstants::LEFT_MOTOR_ID, MotorConstants::LEFT_FRONT_ENCODER_ID){}
+            //rightWheel("right_motor", MotorConstants::RIGHT_MOTOR_ID, MotorConstants::RIGHT_FRONT_ENCODER_ID){}
 
             void initialize(rcl_node_t* node){
                 leftWheel.initialize(node);
-                rightWheel.initialize(node);
+                //rightWheel.initialize(node);
             }
 
             void update(){
                 leftWheel.update();
-                rightWheel.update();
+                //rightWheel.update();
             }
 
             int getNumberOfHandles(){
                 int leftHandle = 1; //speed sub
-                int rightHandle = 1; //speed sub
+                //int rightHandle = 1; //speed sub
                 int timer = 1;
-                return leftHandle + rightHandle + timer;
+                return leftHandle + timer;
             }
     };
 
-    hardware_component::HardwareManager hardware_component::HardwareManager::instance;
-
-    hardware_component::HardwareManager* hardware_component::HardwareManager::getInstance(){
-        return &instance;
-    }
 }
 
 #endif

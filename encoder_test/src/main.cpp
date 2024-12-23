@@ -14,12 +14,11 @@ void setup() {
   Serial.begin(115200);
   encoder.initialize();
 
-  encoder.pulsesPerRevolution = 11.0;
-  encoder.sensorToMechanismRatio = 1;
   delay(2000);
 }
 
 void loop() {
   encoder.update();
-  Serial.println(encoder.position.value);
+  // Serial.println(encoder.velocity.value);
+
 }

@@ -92,7 +92,7 @@ namespace hardware_component{
                     pinToEncoderMap[channelB] = this;
 
                     //set default values for position and velocity so that it doesn't freak out initially
-                    double time = esp_timer_get_time() / 1000000;
+                    double time = (double)esp_timer_get_time() / 1000000.0;
                     previousPosition.timestamp = time;
                     position.timestamp = time;
                     velocity.timestamp = time;
@@ -120,6 +120,8 @@ namespace hardware_component{
                 //motor rotations * sensorToMechRatio = total
                 position.value = (positionRaw.value / pulsesPerRevolution) / sensorToMechanismRatio;
                 position.timestamp = time;
+
+                positionRaw.timestamp = time;
 
                 velocity.value = (positionRaw.getRate(previousPosition) / pulsesPerRevolution) / sensorToMechanismRatio;
                 velocity.timestamp = time;

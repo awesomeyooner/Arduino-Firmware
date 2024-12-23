@@ -106,11 +106,16 @@ namespace hardware_component{
                 //motor rotations * sensorToMechRatio = total
                 position.value = (positionRaw.value / pulsesPerRevolution) / sensorToMechanismRatio;
                 position.timestamp = time;
-                
+
+                positionRaw.timestamp = time;
+
                 velocity.value = (positionRaw.getRate(previousPosition) / pulsesPerRevolution) / sensorToMechanismRatio;
                 velocity.timestamp = time;
 
                 previousPosition = positionRaw;
+
+                Serial.println(velocity.value);
+                delay(20);
             }
   
     };

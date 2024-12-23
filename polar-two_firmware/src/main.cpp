@@ -15,8 +15,9 @@
 #if !defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
 #error This example is only avaliable for Arduino framework with serial transport.
 #endif
+#include <exception>
 
-hardware_component::HardwareManager* hardwareManager;
+hardware_component::HardwareManager hardwareManager;
 
 rclc_executor_t executor;
 rclc_support_t support;
@@ -37,22 +38,19 @@ rcl_timer_t timer;
 void timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
   RCLC_UNUSED(last_call_time);
   if (timer != NULL) {
-    hardwareManager->update();
+    hardwareManager.update();
   }
 }
 
 void leftSubscriberCallback(const void * msgin){
-  hardwareManager->leftWheel.subscriberCallback(msgin);
+  hardwareManager.leftWheel.subscriberCallback(msgin);
 }
 
-void rightSubscriberCallback(const void * msgin){
-  hardwareManager->rightWheel.subscriberCallback(msgin);
-}
+// void rightSubscriberCallback(const void * msgin){
+//   hardwareManager->rightWheel.subscriberCallback(msgin);
+// }
 
 void setup() {
-
-  hardwareManager = hardware_component::HardwareManager::getInstance();
-  hardwareManager->initialize(&node);
 
   // Configure serial transport
   Serial.begin(115200);
@@ -65,10 +63,12 @@ void setup() {
   RCCHECK(rclc_support_init(&support, 0, NULL, &allocator));
 
   // create node
-  RCCHECK(rclc_node_init_default(&node, "esp32_bridge", "", &support));
+  RCCHECK(rclc_node_init_default(&node, "esp32_bridge", "esp32", &support));
+
+  hardwareManager.initialize(&node);
 
   // create timer,
-  const unsigned int timer_timeout = 1000;
+  const unsigned int timer_timeout = 20;
   RCCHECK(rclc_timer_init_default(
     &timer,
     &support,
@@ -76,26 +76,26 @@ void setup() {
     timer_callback));
 
   // create executor
-  RCCHECK(rclc_executor_init(&executor, &support.context, hardwareManager->getNumberOfHandles(), &allocator));
+  RCCHECK(rclc_executor_init(&executor, &support.context, hardwareManager.getNumberOfHandles(), &allocator));
   RCCHECK(rclc_executor_add_timer(&executor, &timer));
 
   RCCHECK(rclc_executor_add_subscription(
     &executor, 
-    &hardwareManager->leftWheel.commandSubscriber, 
-    &hardwareManager->leftWheel.commandMessage, 
+    &hardwareManager.leftWheel.commandSubscriber, 
+    &hardwareManager.leftWheel.commandMessage, 
     &leftSubscriberCallback, 
     ON_NEW_DATA
   ));
 
-  RCCHECK(rclc_executor_add_subscription(
-    &executor, 
-    &hardwareManager->rightWheel.commandSubscriber, 
-    &hardwareManager->rightWheel.commandMessage, 
-    &rightSubscriberCallback, 
-    ON_NEW_DATA
-  ));
+  // RCCHECK(rclc_executor_add_subscription(
+  //   &executor, 
+  //   &hardwareManager->rightWheel.commandSubscriber, 
+  //   &hardwareManager->rightWheel.commandMessage, 
+  //   &rightSubscriberCallback, 
+  //   ON_NEW_DATA
+  // ));
 }
 
 void loop() {
-  RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(100)));
+  RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10)));
 }

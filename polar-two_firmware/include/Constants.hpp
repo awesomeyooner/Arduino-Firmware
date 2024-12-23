@@ -26,8 +26,8 @@ namespace MotorConstants{
 
     //robot specific stuff
     const hardware_component::MotorID LEFT_MOTOR_ID = {
-        .inputPin1 = 1,
-        .inputPin2 = 2,
+        .inputPin1 = 13,
+        .inputPin2 = 12,
         .channel1 = 0,
         .channel2 = 1
     };

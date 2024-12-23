@@ -55,7 +55,7 @@ namespace hardware_component{
             void subscriberCallback(const void * msgin){
                 const std_msgs__msg__Float64 * msg = (const std_msgs__msg__Float64 *)msgin;
 
-                motor.setSpeed(msg->data);
+                motor.command = msg->data;
             }
 
             void initialize(rcl_node_t* node){
@@ -87,6 +87,12 @@ namespace hardware_component{
             void update(){
                 motor.update();
                 encoder.update();
+
+                positionMessage.data = encoder.position.value;
+                velocityMessage.data = encoder.velocity.value;
+
+                RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
+                RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
             }
     };
 }

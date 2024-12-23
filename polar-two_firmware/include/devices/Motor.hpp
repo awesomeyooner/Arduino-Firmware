@@ -8,10 +8,14 @@
 
 namespace hardware_component{
 
+    struct MotorID{
+        int inputPin1, inputPin2;
+        int channel1, channel2;
+    };
+
     class Motor{
 
         private:
-            std::string name;
             int inputPin1, inputPin2;
             int channel1, channel2;
 
@@ -21,12 +25,17 @@ namespace hardware_component{
             bool isBrake = false;
             double controlPercent = 0;
 
-            Motor(std::string name, int inputPin1, int inputPin2, int channel1, int channel2) : 
-                name(name), 
+            Motor(int inputPin1, int inputPin2, int channel1, int channel2) :  
                 inputPin1(inputPin1), 
                 inputPin2(inputPin2),
                 channel1(channel1),
                 channel2(channel2) {}
+
+            Motor(MotorID id) :  
+                inputPin1(id.inputPin1), 
+                inputPin2(id.inputPin2),
+                channel1(id.channel1),
+                channel2(id.channel2) {}
 
             virtual void initialize(){
                 //setup pins for pwm control
@@ -36,6 +45,10 @@ namespace hardware_component{
                 //attach pins
                 ledcAttachPin(inputPin1, channel1);
                 ledcAttachPin(inputPin2, channel2);
+            }
+
+            virtual void update(){
+
             }
 
             virtual void off(){

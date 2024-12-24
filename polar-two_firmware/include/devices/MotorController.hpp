@@ -91,8 +91,8 @@ namespace hardware_component{
                 positionMessage.data = encoder.position.value;
                 velocityMessage.data = encoder.velocity.value;
 
-                RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
-                RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
+                // RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
+                // RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
             }
     };
 }

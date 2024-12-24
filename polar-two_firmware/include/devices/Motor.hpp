@@ -74,14 +74,14 @@ namespace hardware_component{
                 }
                 else if(percent > 0){ //positive
                     setChannels(
-                        map(percent, 0, 1, 0, 255),
+                        map(percent * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE),
                         0
                     );
                 }
                 else if(percent < 0){ //negative
                     setChannels(
                         0,
-                        map(percent, 0, 1, 0, 255)
+                        map(-percent * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE)
                     );
                 }
             }

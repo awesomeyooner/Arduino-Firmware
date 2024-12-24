@@ -2,8 +2,9 @@
 #define CONSTANTS_HPP
 
 namespace GeneralConstants{
-    const int PWM_HERTZ = 100000;
-    const int PWM_RESOLUTION = 8; //bits
+    const int PWM_HERTZ = 10000;
+    const int PWM_RESOLUTION = 12; //bits
+    const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1); 
 }
 
 namespace MotorConstants{

@@ -6,7 +6,6 @@
 
 namespace hardware_component{
 
-
     class HardwareManager{
 
         private:
@@ -23,6 +22,18 @@ namespace hardware_component{
             void initialize(rcl_node_t* node){
                 leftWheel.initialize(node);
                 rightWheel.initialize(node);
+
+                leftWheel.motor.inverted = false;
+                leftWheel.motor.isBrake = false;
+
+                rightWheel.motor.inverted = true;
+                rightWheel.motor.isBrake = false;
+
+                leftWheel.encoder.pulsesPerRevolution = MotorConstants::ENCODER_PPR;
+                leftWheel.encoder.sensorToMechanismRatio = MotorConstants::GEAR_RATIO;
+
+                rightWheel.encoder.pulsesPerRevolution = MotorConstants::ENCODER_PPR;
+                rightWheel.encoder.sensorToMechanismRatio = MotorConstants::GEAR_RATIO;
             }
 
             void update(){

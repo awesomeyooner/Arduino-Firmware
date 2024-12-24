@@ -23,6 +23,7 @@ namespace hardware_component{
         public:
             double pulsesPerRevolution = 1.0;
             double sensorToMechanismRatio = 1.0;
+            bool inverted = false;
 
             Utility::TimestampedNumber position;
             Utility::TimestampedNumber velocity;
@@ -97,12 +98,14 @@ namespace hardware_component{
                 
                 //pulses / ppr = motor rotations
                 //motor rotations * sensorToMechRatio = total
-                position.value = (positionRaw.value / pulsesPerRevolution) / sensorToMechanismRatio;
+                double invertedCoef = inverted ? -1 : 1;
+
+                position.value = invertedCoef * 2 * M_PI * (positionRaw.value / pulsesPerRevolution) / sensorToMechanismRatio;
                 position.timestamp = time;
 
                 positionRaw.timestamp = time;
 
-                velocity.value = (positionRaw.getRate(previousPosition) / pulsesPerRevolution) / sensorToMechanismRatio;
+                velocity.value = invertedCoef * 2 * M_PI * (positionRaw.getRate(previousPosition) / pulsesPerRevolution) / sensorToMechanismRatio;
                 velocity.timestamp = time;
 
                 previousPosition = positionRaw;

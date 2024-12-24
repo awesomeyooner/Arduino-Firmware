@@ -11,7 +11,6 @@ namespace hardware_component{
     class Motor{
 
         private:
-            std::string name;
             int inputPin1, inputPin2;
             int channel1, channel2;
 
@@ -19,10 +18,9 @@ namespace hardware_component{
 
             bool inverted = false;
             bool isBrake = false;
-            double controlPercent = 0;
+            double command = 0;
 
-            Motor(std::string name, int inputPin1, int inputPin2, int channel1, int channel2) : 
-                name(name), 
+            Motor(int inputPin1, int inputPin2, int channel1, int channel2) :  
                 inputPin1(inputPin1), 
                 inputPin2(inputPin2),
                 channel1(channel1),
@@ -36,6 +34,10 @@ namespace hardware_component{
                 //attach pins
                 ledcAttachPin(inputPin1, channel1);
                 ledcAttachPin(inputPin2, channel2);
+            }
+
+            virtual void update(){
+                setSpeed(command);
             }
 
             virtual void off(){
@@ -66,14 +68,16 @@ namespace hardware_component{
                 }
                 else if(percent > 0){ //positive
                     setChannels(
-                        map(percent, 0, 1, 0, 255),
+                        map(percent * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE),
                         0
                     );
+
+                    // Serial.println(map(percent * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE));
                 }
                 else if(percent < 0){ //negative
                     setChannels(
                         0,
-                        map(percent, 0, 1, 0, 255)
+                        map(-percent * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE)
                     );
                 }
             }

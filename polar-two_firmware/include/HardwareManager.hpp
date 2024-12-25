@@ -24,15 +24,15 @@ namespace hardware_component{
                 rightWheel.initialize(node);
 
                 leftWheel.motor.inverted = false;
-                leftWheel.motor.isBrake = false;
+                leftWheel.motor.isBrake = true;
 
                 rightWheel.motor.inverted = true;
-                rightWheel.motor.isBrake = false;
+                rightWheel.motor.isBrake = true;
 
-                leftWheel.encoder.pulsesPerRevolution = MotorConstants::ENCODER_PPR;
+                leftWheel.encoder.countsPerRevolution = MotorConstants::ENCODER_CPR;
                 leftWheel.encoder.sensorToMechanismRatio = MotorConstants::GEAR_RATIO;
 
-                rightWheel.encoder.pulsesPerRevolution = MotorConstants::ENCODER_PPR;
+                rightWheel.encoder.countsPerRevolution = MotorConstants::ENCODER_CPR;
                 rightWheel.encoder.sensorToMechanismRatio = MotorConstants::GEAR_RATIO;
             }
 

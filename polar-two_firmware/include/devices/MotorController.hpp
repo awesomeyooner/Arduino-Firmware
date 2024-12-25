@@ -42,9 +42,9 @@ namespace hardware_component{
             Motor motor;
             Encoder encoder;
 
-            MotorController(std::string name, int inputPin1, int inputPin2, int channel1, int channel2, int channelA, int channelB) : 
+            MotorController(std::string name, int enablePin, int inputPin1, int inputPin2, int channelEnable, int channel1, int channel2, int channelA, int channelB) : 
                 name(name),
-                motor(inputPin1, inputPin2, channel1, channel2),
+                motor(enablePin, inputPin1, inputPin2, channelEnable, channel1, channel2),
                 encoder(channelA, channelB){}
 
             MotorController(std::string name, MotorID motorID, EncoderID encoderID) : 
@@ -62,21 +62,21 @@ namespace hardware_component{
                 motor.initialize();
                 encoder.initialize();
 
-                RCCHECK(rclc_publisher_init_default(
+                RCCHECK(rclc_publisher_init_best_effort(
                     &positionPublisher,
                     node,
                     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float64),
                     (name + "/position").c_str()
                 ));
 
-                RCCHECK(rclc_publisher_init_default(
+                RCCHECK(rclc_publisher_init_best_effort(
                     &velocityPublisher,
                     node,
                     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float64),
                     (name + "/velocity").c_str()
                 ));
 
-                RCCHECK(rclc_subscription_init_default(
+                RCCHECK(rclc_subscription_init_best_effort(
                     &commandSubscriber,
                     node,
                     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float64),
@@ -91,8 +91,8 @@ namespace hardware_component{
                 positionMessage.data = encoder.position.value;
                 velocityMessage.data = encoder.velocity.value;
 
-                // RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
-                // RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
+                //RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
+                //RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
             }
     };
 }

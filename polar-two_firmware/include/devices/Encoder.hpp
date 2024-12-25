@@ -21,7 +21,7 @@ namespace hardware_component{
             Utility::TimestampedNumber positionRaw;
 
         public:
-            double pulsesPerRevolution = 1.0;
+            double countsPerRevolution = 1.0;
             double sensorToMechanismRatio = 1.0;
             bool inverted = false;
 
@@ -96,16 +96,16 @@ namespace hardware_component{
             virtual void update(){
                 double time = (double)esp_timer_get_time() / 1000000.0;
                 
-                //pulses / ppr = motor rotations
+                //counts / cpr = motor rotations
                 //motor rotations * sensorToMechRatio = total
                 double invertedCoef = inverted ? -1 : 1;
 
-                position.value = invertedCoef * 2 * M_PI * (positionRaw.value / pulsesPerRevolution) / sensorToMechanismRatio;
+                position.value = invertedCoef * 2 * M_PI * (positionRaw.value / countsPerRevolution) / sensorToMechanismRatio;
                 position.timestamp = time;
 
                 positionRaw.timestamp = time;
 
-                velocity.value = invertedCoef * 2 * M_PI * (positionRaw.getRate(previousPosition) / pulsesPerRevolution) / sensorToMechanismRatio;
+                velocity.value = invertedCoef * 2 * M_PI * (positionRaw.getRate(previousPosition) / countsPerRevolution) / sensorToMechanismRatio;
                 velocity.timestamp = time;
 
                 previousPosition = positionRaw;

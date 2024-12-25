@@ -11,7 +11,7 @@
 // hardware_component::Encoder left_encoder(23, 22);
 // hardware_component::Encoder right_encoder(19, 18);
 
-hardware_component::Motor motor(12, 13, 0, 1);
+hardware_component::Motor motor(14, 12, 13, 0, 1, 2);
 
 void setup() {
   // Configure serial transport
@@ -35,5 +35,5 @@ void loop() {
   // Serial.println(output.c_str());
   // delay(20);
 
-  motor.setSpeed(0.1);
+  motor.setSpeed(-0.1);
 }

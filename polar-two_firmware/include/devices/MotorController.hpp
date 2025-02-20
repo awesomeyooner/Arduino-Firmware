@@ -45,20 +45,18 @@ namespace hardware_component{
             MotorController(std::string name, int enablePin, int inputPin1, int inputPin2, int channelEnable, int channel1, int channel2, int channelA, int channelB) : 
                 name(name),
                 motor(enablePin, inputPin1, inputPin2, channelEnable, channel1, channel2),
-                encoder(channelA, channelB){}
+                encoder(channelA, channelB){
+                    commandMessage.data = 0;
+                }
 
             MotorController(std::string name, MotorID motorID, EncoderID encoderID) : 
                 name(name),
                 motor(motorID),
-                encoder(encoderID){}
+                encoder(encoderID){
+                    commandMessage.data = 0;
+                }
 
-            void subscriberCallback(const void * msgin){
-                const std_msgs__msg__Float64 * msg = (const std_msgs__msg__Float64 *)msgin;
-
-                motor.command = msg->data;
-            }
-
-            void initialize(rcl_node_t* node){
+            void initialize(rcl_node_t* node, rclc_executor_t* executor){
                 motor.initialize();
                 encoder.initialize();
 
@@ -82,6 +80,14 @@ namespace hardware_component{
                     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float64),
                     (name + "/command").c_str()
                 ));
+
+                RCCHECK(rclc_executor_add_subscription(
+                    executor, 
+                    &commandSubscriber, 
+                    &commandMessage, 
+                    [](const void * msgin) -> void{}, 
+                    ON_NEW_DATA
+                ));
             }
 
             void update(){
@@ -91,8 +97,14 @@ namespace hardware_component{
                 positionMessage.data = encoder.position.value;
                 velocityMessage.data = encoder.velocity.value;
 
-                //RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
-                //RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
+                motor.command = commandMessage.data;
+
+                RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
+                RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
+            }
+
+            int getNumberOfHandles(){
+                return 1; //subscriber
             }
     };
 }

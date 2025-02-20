@@ -42,14 +42,6 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
   }
 }
 
-void leftSubscriberCallback(const void * msgin){
-  hardwareManager.leftWheel.subscriberCallback(msgin);
-}
-
-void rightSubscriberCallback(const void * msgin){
-  hardwareManager.rightWheel.subscriberCallback(msgin);
-}
-
 void setup() {
 
   // Configure serial transport
@@ -65,8 +57,6 @@ void setup() {
   // create node
   RCCHECK(rclc_node_init_default(&node, "esp32_bridge", "esp32", &support));
 
-  hardwareManager.initialize(&node);
-
   // create timer,
   const unsigned int timer_timeout = 20;
   RCCHECK(rclc_timer_init_default(
@@ -79,21 +69,8 @@ void setup() {
   RCCHECK(rclc_executor_init(&executor, &support.context, hardwareManager.getNumberOfHandles(), &allocator));
   RCCHECK(rclc_executor_add_timer(&executor, &timer));
 
-  RCCHECK(rclc_executor_add_subscription(
-    &executor, 
-    &hardwareManager.leftWheel.commandSubscriber, 
-    &hardwareManager.leftWheel.commandMessage, 
-    &leftSubscriberCallback, 
-    ON_NEW_DATA
-  ));
+  hardwareManager.initialize(&node, &executor);
 
-  RCCHECK(rclc_executor_add_subscription(
-    &executor, 
-    &hardwareManager.rightWheel.commandSubscriber, 
-    &hardwareManager.rightWheel.commandMessage, 
-    &rightSubscriberCallback, 
-    ON_NEW_DATA
-  ));
 }
 
 void loop() {

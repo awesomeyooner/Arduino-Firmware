@@ -16,12 +16,12 @@ namespace hardware_component{
             MotorController rightWheel;
 
             HardwareManager() : 
-            leftWheel("left_motor", MotorConstants::LEFT_MOTOR_ID, MotorConstants::LEFT_FRONT_ENCODER_ID),
-            rightWheel("right_motor", MotorConstants::RIGHT_MOTOR_ID, MotorConstants::RIGHT_FRONT_ENCODER_ID){}
+            leftWheel("front_left_motor", MotorConstants::LEFT_MOTOR_ID, MotorConstants::LEFT_FRONT_ENCODER_ID),
+            rightWheel("front_right_motor", MotorConstants::RIGHT_MOTOR_ID, MotorConstants::RIGHT_FRONT_ENCODER_ID){}
 
-            void initialize(rcl_node_t* node){
-                leftWheel.initialize(node);
-                rightWheel.initialize(node);
+            void initialize(rcl_node_t* node, rclc_executor_t* executor){
+                leftWheel.initialize(node, executor);
+                rightWheel.initialize(node, executor);
 
                 leftWheel.motor.inverted = false;
                 leftWheel.motor.isBrake = true;
@@ -42,10 +42,8 @@ namespace hardware_component{
             }
 
             int getNumberOfHandles(){
-                int leftHandle = 1; //speed sub
-                int rightHandle = 1; //speed sub
                 int timer = 1;
-                return leftHandle + rightHandle + timer;
+                return leftWheel.getNumberOfHandles() + rightWheel.getNumberOfHandles() + timer;
             }
     };
 

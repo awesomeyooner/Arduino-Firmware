@@ -2,7 +2,9 @@
 #define HARDWAREMANAGER_HPP
 
 #include "devices/MotorController.hpp"
+#include "util/builtin_led.hpp"
 #include "Constants.hpp"
+#include <vector>
 
 namespace hardware_component{
 
@@ -12,40 +14,54 @@ namespace hardware_component{
         
         public:
 
-            MotorController leftWheel;
-            MotorController rightWheel;
+            MotorController front_left_motor;
+            MotorController front_right_motor;
+            MotorController rear_left_motor;
+            MotorController rear_right_motor;
+
+            BuiltinLED statusLight;
+
+            std::vector<MotorController*> motors = {
+                &front_left_motor,
+                &front_right_motor,
+                &rear_left_motor,
+                &rear_right_motor
+            };
+
+            bool estop = false;
 
             HardwareManager() : 
-            leftWheel("left_motor", MotorConstants::LEFT_MOTOR_ID, MotorConstants::LEFT_FRONT_ENCODER_ID),
-            rightWheel("right_motor", MotorConstants::RIGHT_MOTOR_ID, MotorConstants::RIGHT_FRONT_ENCODER_ID){}
+            front_left_motor("front_left_motor", MotorConstants::LEFT_MOTOR_ID, MotorConstants::FRONT_LEFT_ENCODER_ID),
+            front_right_motor("front_right_motor", MotorConstants::RIGHT_MOTOR_ID, MotorConstants::FRONT_RIGHT_ENCODER_ID),
+            rear_left_motor("rear_left_motor", MotorConstants::REAR_LEFT_ENCODER_ID),
+            rear_right_motor("rear_right_motor", MotorConstants::REAR_RIGHT_ENCODER_ID){}
 
-            void initialize(rcl_node_t* node){
-                leftWheel.initialize(node);
-                rightWheel.initialize(node);
+            void initialize(rcl_node_t* node, rclc_executor_t* executor){
 
-                leftWheel.motor.inverted = false;
-                leftWheel.motor.isBrake = false;
-
-                rightWheel.motor.inverted = true;
-                rightWheel.motor.isBrake = false;
-
-                leftWheel.encoder.pulsesPerRevolution = MotorConstants::ENCODER_PPR;
-                leftWheel.encoder.sensorToMechanismRatio = MotorConstants::GEAR_RATIO;
-
-                rightWheel.encoder.pulsesPerRevolution = MotorConstants::ENCODER_PPR;
-                rightWheel.encoder.sensorToMechanismRatio = MotorConstants::GEAR_RATIO;
+                for(MotorController* motor : motors){
+                    motor->initialize(node, executor);
+                    motor->motor.isBrake = true;
+                }
+                statusLight.initialize();
             }
 
             void update(){
-                leftWheel.update();
-                rightWheel.update();
+                for(MotorController* motor : motors){
+                    motor->update(estop);
+                }
+            }
+
+            void toggleEstop(bool toggle){
+                estop = toggle;
             }
 
             int getNumberOfHandles(){
-                int leftHandle = 1; //speed sub
-                int rightHandle = 1; //speed sub
-                int timer = 1;
-                return leftHandle + rightHandle + timer;
+                int sum = 1; //1 for the timer
+
+                for(MotorController* motor : motors){
+                    sum += motor->getNumberOfHandles();
+                }
+                return sum;
             }
     };
 

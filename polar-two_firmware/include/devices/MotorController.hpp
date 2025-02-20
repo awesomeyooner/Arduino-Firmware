@@ -42,57 +42,80 @@ namespace hardware_component{
             Motor motor;
             Encoder encoder;
 
-            MotorController(std::string name, int inputPin1, int inputPin2, int channel1, int channel2, int channelA, int channelB) : 
+            MotorController(std::string name, int enablePin, int inputPin1, int inputPin2, int channelEnable, int channel1, int channel2, int channelA, int channelB) : 
                 name(name),
-                motor(inputPin1, inputPin2, channel1, channel2),
-                encoder(channelA, channelB){}
+                motor(enablePin, inputPin1, inputPin2, channelEnable, channel1, channel2),
+                encoder(channelA, channelB){
+                    commandMessage.data = 0;
+                }
 
             MotorController(std::string name, MotorID motorID, EncoderID encoderID) : 
                 name(name),
                 motor(motorID),
-                encoder(encoderID){}
+                encoder(encoderID){
+                    commandMessage.data = 0;
+                }
 
-            void subscriberCallback(const void * msgin){
-                const std_msgs__msg__Float64 * msg = (const std_msgs__msg__Float64 *)msgin;
+            MotorController(std::string name, EncoderID encoderID) : 
+                name(name),
+                motor(),
+                encoder(encoderID){
+                    commandMessage.data = 0;
+                }
 
-                motor.command = msg->data;
-            }
-
-            void initialize(rcl_node_t* node){
+            void initialize(rcl_node_t* node, rclc_executor_t* executor){
                 motor.initialize();
                 encoder.initialize();
 
-                RCCHECK(rclc_publisher_init_default(
+                RCCHECK(rclc_publisher_init_best_effort(
                     &positionPublisher,
                     node,
                     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float64),
                     (name + "/position").c_str()
                 ));
 
-                RCCHECK(rclc_publisher_init_default(
+                RCCHECK(rclc_publisher_init_best_effort(
                     &velocityPublisher,
                     node,
                     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float64),
                     (name + "/velocity").c_str()
                 ));
 
-                RCCHECK(rclc_subscription_init_default(
+                RCCHECK(rclc_subscription_init_best_effort(
                     &commandSubscriber,
                     node,
                     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float64),
                     (name + "/command").c_str()
                 ));
+
+                RCCHECK(rclc_executor_add_subscription(
+                    executor, 
+                    &commandSubscriber, 
+                    &commandMessage, 
+                    [](const void * msgin) -> void{}, 
+                    ON_NEW_DATA
+                ));
             }
 
-            void update(){
-                motor.update();
+            void update(bool estop){
+                if(!estop)
+                    motor.update();
+                else
+                    motor.off();
+
                 encoder.update();
 
                 positionMessage.data = encoder.position.value;
                 velocityMessage.data = encoder.velocity.value;
 
-                // RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
-                // RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
+                motor.command = commandMessage.data;
+
+                RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
+                RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
+            }
+
+            int getNumberOfHandles(){
+                return 1; //subscriber
             }
     };
 }

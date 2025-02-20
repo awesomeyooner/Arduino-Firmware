@@ -20,6 +20,8 @@ namespace hardware_component{
             bool isBrake = false;
             double command = 0;
 
+            bool isFake = false;
+
             Motor(int enablePin, int inputPin1, int inputPin2, int channelEnable, int channel1, int channel2) :  
                 enablePin(enablePin),
                 inputPin1(inputPin1), 
@@ -36,7 +38,12 @@ namespace hardware_component{
                 channel1(id.channel1),
                 channel2(id.channel2) {}
 
+            Motor() : isFake(true){}
+
             virtual void initialize(){
+                if(isFake)
+                    return;
+
                 //setup pins for pwm control
                 ledcSetup(channelEnable, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
                 ledcSetup(channel1, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
@@ -51,10 +58,16 @@ namespace hardware_component{
             }
 
             virtual void update(){
+                if(isFake)
+                    return;
+
                 setSpeed(command);
             }
 
             virtual void off(){
+                if(isFake)
+                    return;
+
                 setSpeed(0);
             }
 
@@ -62,6 +75,8 @@ namespace hardware_component{
              * percent is from -1 to 1, 1 representing 100% output in forward direction
              */
             virtual void setSpeed(double percent){
+                if(isFake)
+                    return;
 
                 //out of bounds protection
                 if(percent > 1)
@@ -97,12 +112,18 @@ namespace hardware_component{
             }
 
             void setChannels(int enableValue, int value1, int value2){
+                if(isFake)
+                    return;
+
                 ledcWrite(channelEnable, enableValue);
                 ledcWrite(channel1, value1);
                 ledcWrite(channel2, value2);
             }
             
             void setChannels(double enableValue, double value1, double value2){
+                if(isFake)
+                    return;
+                    
                 ledcWrite(channelEnable, (int)enableValue);
                 ledcWrite(channel1, (int)value1);
                 ledcWrite(channel2, (int)value2);

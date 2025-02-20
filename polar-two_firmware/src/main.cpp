@@ -37,9 +37,11 @@ rcl_timer_t timer;
 
 void timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
   RCLC_UNUSED(last_call_time);
+
   if (timer != NULL) {
     hardwareManager.update();
   }
+
 }
 
 void setup() {
@@ -74,5 +76,22 @@ void setup() {
 }
 
 void loop() {
-  RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10)));
+  RCCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10)));
+
+  // Timeout for each attempt
+  // const int timeout_ms = 1000;
+
+  // // Number of attemps
+  // const uint8_t attemps = 5;
+
+  // Ping the agent
+  rmw_ret_t ping_result = rmw_uros_ping_agent(500, 5);
+
+  if (RMW_RET_OK == ping_result){
+      hardwareManager.statusLight.turn_on();
+  }
+  else{
+      hardwareManager.statusLight.turn_off();
+      hardwareManager.toggleEstop(true);
+  }
 }

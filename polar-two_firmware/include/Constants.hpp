@@ -14,6 +14,7 @@ namespace hardware_component{
 }
 
 namespace GeneralConstants{
+    const int TIMEOUT_MS = 500;
     const int PWM_HERTZ = 100000;
     const int PWM_RESOLUTION = 8; //bits
     const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1); 
@@ -44,22 +45,22 @@ namespace MotorConstants{
         .channel2 = 5
     };
 
-    const hardware_component::EncoderID LEFT_FRONT_ENCODER_ID = {
+    const hardware_component::EncoderID FRONT_LEFT_ENCODER_ID = {
         .channelA = 19,
         .channelB = 18
     };
 
-    const hardware_component::EncoderID LEFT_BACK_ENCODER_ID = {
+    const hardware_component::EncoderID REAR_LEFT_ENCODER_ID = {
         .channelA = 23,
         .channelB = 22
     };
 
-    const hardware_component::EncoderID RIGHT_FRONT_ENCODER_ID = {
+    const hardware_component::EncoderID FRONT_RIGHT_ENCODER_ID = {
         .channelA = 26,
         .channelB = 27
     };
 
-    const hardware_component::EncoderID RIGHT_BACK_ENCODER_ID = {
+    const hardware_component::EncoderID REAR_RIGHT_ENCODER_ID = {
         .channelA = 34,
         .channelB = 35
     };

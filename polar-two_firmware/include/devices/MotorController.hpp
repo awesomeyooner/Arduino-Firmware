@@ -56,6 +56,13 @@ namespace hardware_component{
                     commandMessage.data = 0;
                 }
 
+            MotorController(std::string name, EncoderID encoderID) : 
+                name(name),
+                motor(),
+                encoder(encoderID){
+                    commandMessage.data = 0;
+                }
+
             void initialize(rcl_node_t* node, rclc_executor_t* executor){
                 motor.initialize();
                 encoder.initialize();
@@ -90,8 +97,12 @@ namespace hardware_component{
                 ));
             }
 
-            void update(){
-                motor.update();
+            void update(bool estop){
+                if(!estop)
+                    motor.update();
+                else
+                    motor.off();
+
                 encoder.update();
 
                 positionMessage.data = encoder.position.value;

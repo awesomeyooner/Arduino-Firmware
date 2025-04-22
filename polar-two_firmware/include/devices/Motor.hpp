@@ -54,7 +54,6 @@ namespace hardware_component{
                 ledcAttachPin(inputPin1, channel1);
                 ledcAttachPin(inputPin2, channel2);
 
-
             }
 
             virtual void update(){

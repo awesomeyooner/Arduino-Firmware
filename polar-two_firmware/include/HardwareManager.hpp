@@ -14,27 +14,21 @@ namespace hardware_component{
         
         public:
 
-            MotorController front_left_motor;
-            MotorController front_right_motor;
-            MotorController rear_left_motor;
-            MotorController rear_right_motor;
+            MotorController left_motor;
+            MotorController right_motor;
 
             BuiltinLED statusLight;
 
             std::vector<MotorController*> motors = {
-                &front_left_motor,
-                &front_right_motor,
-                &rear_left_motor,
-                &rear_right_motor
+                &left_motor,
+                &right_motor
             };
 
             bool estop = false;
 
             HardwareManager() : 
-            front_left_motor("front_left_motor", MotorConstants::LEFT_MOTOR_ID, MotorConstants::FRONT_LEFT_ENCODER_ID),
-            front_right_motor("front_right_motor", MotorConstants::RIGHT_MOTOR_ID, MotorConstants::FRONT_RIGHT_ENCODER_ID),
-            rear_left_motor("rear_left_motor", MotorConstants::REAR_LEFT_ENCODER_ID),
-            rear_right_motor("rear_right_motor", MotorConstants::REAR_RIGHT_ENCODER_ID){}
+            left_motor("left_motor", MotorConstants::LEFT_MOTOR_ID, MotorConstants::LEFT_ENCODER_ID),
+            right_motor("right_motor", MotorConstants::RIGHT_MOTOR_ID, MotorConstants::RIGHT_ENCODER_ID){}
 
             void initialize(rcl_node_t* node, rclc_executor_t* executor){
 

@@ -15,8 +15,8 @@ namespace hardware_component{
 
 namespace GeneralConstants{
     const int TIMEOUT_MS = 500;
-    const int PWM_HERTZ = 100000;
-    const int PWM_RESOLUTION = 8; //bits
+    const int PWM_HERTZ = 100000; // 10 kHz
+    const int PWM_RESOLUTION = 8; // bits
     const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1); 
 }
 

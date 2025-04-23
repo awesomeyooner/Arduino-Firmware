@@ -10,9 +10,10 @@ namespace drivers{
             virtual ~Driver(){}
 
             virtual void initialize(){}
-            virtual void update(){}
 
             virtual void set_percent(double command){}
+
+            virtual void stop(){}
         
         private:
 

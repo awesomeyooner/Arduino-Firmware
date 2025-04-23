@@ -3,44 +3,78 @@
 
 #include "base/driver.hpp"
 #include "Constants.hpp"
+#include <esp32-hal-ledc.h>
+#include <esp32-hal-gpio.h>
+#include <Arduino.h>
 namespace drivers{
     
     class L298N : public Driver{
 
         public:
 
-            L298N(int _enA, int _in1, int _in2, int _in3, int _in4, int _enB) : Driver(){
+            /**
+             * @brief Creates a new driver object for the L298N motor driver
+             * 
+             * @param _index Starting index for the PWM channel
+             * @param _in1 Input 1 pin
+             * @param _in2 Input 2 pin
+             */
+            L298N(int _index, int _enA, int _in1, int _in2) : Driver(){
+                enA = _enA;
+                in1 = _in1;
+                in2 = _in2;
+
+                c_in1 = _index;
+                c_in2 = _index + 1;
 
             }
 
             void initialize() override{
+                pinMode(enA, OUTPUT);
+
                 //setup pins for pwm control
-                ledcSetup(channelEnable, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
-                ledcSetup(channel1, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
-                ledcSetup(channel2, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
-
+                ledcSetup(c_in1, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
+                ledcSetup(c_in2, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
+          
                 //attach pins
-                ledcAttachPin(enablePin, channelEnable);
-                ledcAttachPin(inputPin1, channel1);
-                ledcAttachPin(inputPin2, channel2);
-            }
-
-            void update() override{
-
+                ledcAttachPin(in1, c_in1);
+                ledcAttachPin(in2, c_in2);
             }
 
             void set_percent(double command) override{
 
+                //out of bounds protection
+                if(command > 1)
+                    command = 1;
+                else if(command < -1)
+                    command = -1;
+
+                if(command > 0){
+                    digitalWrite(enA, HIGH);
+                    ledcWrite(in1, map(abs(command) * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE));
+                    ledcWrite(in2, 0);
+                }     
+                else if(command < 0){
+                    digitalWrite(enA, HIGH);
+                    ledcWrite(in1, 0);
+                    ledcWrite(in2, map(abs(command) * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE));
+                }
+                else{
+                    digitalWrite(enA, LOW);
+                    ledcWrite(in1, 0);
+                    ledcWrite(in2, 0);
+                }
             }
 
-            void set_raw(double raw){
-
+            void stop() override{
+                set_percent(0);
             }
+            
 
         private:
 
             int enA, in1, in2;
-            int enB, in3, in4;
+            int c_in1, c_in2;
 
 
     }; // class L298N

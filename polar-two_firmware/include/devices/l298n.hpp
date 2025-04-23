@@ -6,7 +6,7 @@
 #include <esp32-hal-ledc.h>
 #include <esp32-hal-gpio.h>
 #include <Arduino.h>
-namespace drivers{
+namespace hardware_component{
     
     class L298N : public Driver{
 
@@ -33,31 +33,31 @@ namespace drivers{
                 pinMode(enA, OUTPUT);
 
                 //setup pins for pwm control
-                ledcSetup(c_in1, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
-                ledcSetup(c_in2, GeneralConstants::PWM_HERTZ, GeneralConstants::PWM_RESOLUTION);
+                ledcSetup(c_in1, PWM_HERTZ, PWM_RESOLUTION);
+                ledcSetup(c_in2, PWM_HERTZ, PWM_RESOLUTION);
           
                 //attach pins
                 ledcAttachPin(in1, c_in1);
                 ledcAttachPin(in2, c_in2);
             }
 
-            void set_percent(double command) override{
+            void set_percent(double request) override{
 
                 //out of bounds protection
-                if(command > 1)
-                    command = 1;
-                else if(command < -1)
-                    command = -1;
+                if(request > 1)
+                    request = 1;
+                else if(request < -1)
+                    request = -1;
 
-                if(command > 0){
+                if(request > 0){
                     digitalWrite(enA, HIGH);
-                    ledcWrite(in1, map(abs(command) * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE));
+                    ledcWrite(in1, map(abs(request) * 1000, 0, 1000, 0, MAX_DUTY_CYCLE));
                     ledcWrite(in2, 0);
                 }     
-                else if(command < 0){
+                else if(request < 0){
                     digitalWrite(enA, HIGH);
                     ledcWrite(in1, 0);
-                    ledcWrite(in2, map(abs(command) * 1000, 0, 1000, 0, GeneralConstants::MAX_DUTY_CYCLE));
+                    ledcWrite(in2, map(abs(request) * 1000, 0, 1000, 0, MAX_DUTY_CYCLE));
                 }
                 else{
                     digitalWrite(enA, LOW);
@@ -69,6 +69,12 @@ namespace drivers{
             void stop() override{
                 set_percent(0);
             }
+
+            void brake(){
+                digitalWrite(enA, HIGH);
+                ledcWrite(in1, MAX_DUTY_CYCLE);
+                ledcWrite(in2, MAX_DUTY_CYCLE);
+            }
             
 
         private:
@@ -79,6 +85,6 @@ namespace drivers{
 
     }; // class L298N
 
-} // namespace drivers
+} // namespace hardware_component
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef DRIVER_HPP
 #define DRIVER_HPP
 
-namespace drivers{
+namespace hardware_component{
 
     class Driver{
 
@@ -11,7 +11,7 @@ namespace drivers{
 
             virtual void initialize(){}
 
-            virtual void set_percent(double command){}
+            virtual void set_percent(double request){}
 
             virtual void stop(){}
         
@@ -20,6 +20,6 @@ namespace drivers{
 
     }; // class Driver
      
-} // namespace drivers
+} // namespace hardware_component
 
 #endif

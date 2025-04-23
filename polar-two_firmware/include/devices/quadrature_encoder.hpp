@@ -1,5 +1,5 @@
-#ifndef ENCODER_HPP
-#define ENCODER_HPP
+#ifndef QUADRATURE_ENCODER_HPP
+#define QUADRATURE_ENCODER_HPP
 
 #include <string>
 #include "../Constants.hpp"
@@ -9,10 +9,11 @@
 #include <map>
 #include "esp_timer.h"
 #include <FunctionalInterrupt.h>
+#include "base/encoder.hpp"
 
 namespace hardware_component{
 
-    class Encoder{
+    class QuadratureEncoder : public Encoder{
 
         private:
             int channelA, channelB;
@@ -20,15 +21,16 @@ namespace hardware_component{
             Utility::TimestampedNumber previousPosition;
             Utility::TimestampedNumber positionRaw;
 
+            Utility::TimestampedNumber position;
+            Utility::TimestampedNumber velocity;
+
         public:
             double countsPerRevolution = 1.0;
             double sensorToMechanismRatio = 1.0;
             bool inverted = false;
 
-            Utility::TimestampedNumber position;
-            Utility::TimestampedNumber velocity;
 
-            Encoder(int channelA, int channelB) : 
+            QuadratureEncoder(int channelA, int channelB) : 
                 channelA(channelA),
                 channelB(channelB){
     
@@ -39,23 +41,20 @@ namespace hardware_component{
                     velocity.timestamp = time;
             }
 
-            Encoder(EncoderID id) : 
-                channelA(id.channelA),
-                channelB(id.channelB){
-    
-                    //set default values for position and velocity so that it doesn't freak out initially
-                    double time = (double)esp_timer_get_time() / 1000000.0;
-                    previousPosition.timestamp = time;
-                    position.timestamp = time;
-                    velocity.timestamp = time;
-            }
-
-            virtual void initialize(){
+            void initialize() override{
                 pinMode(channelA, INPUT_PULLDOWN);
                 pinMode(channelB, INPUT_PULLDOWN);
 
                 attachInterrupt(digitalPinToInterrupt(channelA), [this](){handleA();}, CHANGE);
                 attachInterrupt(digitalPinToInterrupt(channelB), [this](){handleB();}, CHANGE);
+            }
+
+            double get_position() override{
+                return position.value; 
+            }
+
+            double get_velocity() override{
+                return velocity.value;
             }
 
             void handleA(){
@@ -93,7 +92,7 @@ namespace hardware_component{
             /**
              * this NEEDS some sort of delay for it to work properly
              */
-            virtual void update(){
+            void update() override{
                 double time = (double)esp_timer_get_time() / 1000000.0;
                 
                 //counts / cpr = motor rotations

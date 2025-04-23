@@ -1,7 +1,7 @@
 #ifndef ENCODER_HPP
 #define ENCODER_HPP
 
-namespace encoders{
+namespace hardware_component{
 
     class Encoder{
 
@@ -10,12 +10,14 @@ namespace encoders{
 
             virtual void initialize(){}
 
-            virtual double get_position(){}
+            virtual void update(){}
 
-            virtual double get_velocity(){}
+            virtual double get_position(){return 0;}
+
+            virtual double get_velocity(){return 0;}
 
 
     }; // class Encoder
-} // namespace encoders
+} // namespace hardware_component
 
 #endif // ENCODER_HPP

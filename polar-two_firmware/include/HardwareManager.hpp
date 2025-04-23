@@ -13,8 +13,8 @@ namespace hardware_component{
         public:
 
             HardwareManager() : 
-                left_motor("left_motor", MotorConstants::DEVICE_INDEX_LEFT_MOTOR, MotorConstants::LEFT_MOTOR_ID),
-                right_motor("right_motor", MotorConstants::DEVICE_INDEX_RIGHT_MOTOR, MotorConstants::RIGHT_MOTOR_ID){}
+                left_motor("left_motor", MotorConstants::INDEX_LEFT_MOTOR, MotorConstants::LEFT_MOTOR_ID),
+                right_motor("right_motor", MotorConstants::INDEX_RIGHT_MOTOR, MotorConstants::RIGHT_MOTOR_ID){}
 
             void initialize(rcl_node_t* node, rclc_executor_t* executor){
 

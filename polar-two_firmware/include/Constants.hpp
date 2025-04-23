@@ -11,7 +11,6 @@ const int PWM_HERTZ = 100000; // 10 kHz
 const int PWM_RESOLUTION = 8; // bits
 const int MAX_DUTY_CYCLE = (int)(pow(2, PWM_RESOLUTION) - 1); 
 
-
 namespace MotorConstants{
     const int ENCODER_CPR = 12 * 4; //12ppr, 4 per
     const int GEAR_RATIO = 45;
@@ -21,7 +20,7 @@ namespace MotorConstants{
     //robot specific stuff
 
         // Left L298N Configuration
-        const int DEVICE_INDEX_LEFT_MOTOR = 0; // 0, 1
+        const int INDEX_LEFT_MOTOR = 0; // 0, 1
         const int PIN_LEFT_MOTOR_ENA = 5;
         const int PIN_LEFT_MOTOR_IN1 = 17;
         const int PIN_LEFT_MOTOR_IN2 = 16;
@@ -41,7 +40,7 @@ namespace MotorConstants{
         };
 
         // Right L298N Configuration
-        const int DEVICE_INDEX_RIGHT_MOTOR = 2; // 2, 3
+        const int INDEX_RIGHT_MOTOR = 2; // 2, 3
         const int PIN_RIGHT_MOTOR_ENA = 14;
         const int PIN_RIGHT_MOTOR_IN1 = 12;
         const int PIN_RIGHT_MOTOR_IN2 = 13;

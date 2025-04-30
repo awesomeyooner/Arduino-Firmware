@@ -19,7 +19,7 @@ namespace hardware_component{
             bool inverted = false;
             double command = 0;
 
-            Motor(bool fake){
+            Motor(bool fake = false){
                 if(fake){
                     driver = new Driver();
                     encoder = new Encoder();

@@ -21,44 +21,24 @@ namespace MotorConstants{
 
     //robot specific stuff
 
-        // Left L298N Configuration
-        const int INDEX_LEFT_MOTOR = 0; // 0, 1
-        const int PIN_LEFT_MOTOR_ENA = 5;
-        const int PIN_LEFT_MOTOR_IN1 = 17;
-        const int PIN_LEFT_MOTOR_IN2 = 16;
+        // L298N Configuration
+        const int INDEX_MOTOR = 0; // 0, 1
+        const int PIN_MOTOR_ENA = 5;
+        const int PIN_MOTOR_IN1 = 17;
+        const int PIN_MOTOR_IN2 = 16;
 
-        // Left Quadrature Encoder Configuration
-        const int PIN_LEFT_MOTOR_CHA = 19;
-        const int PIN_LEFT_MOTOR_CHB = 18;
-
-        // ID Struct
-        const SensoredMotorID LEFT_MOTOR_ID = {
-            .enA = PIN_LEFT_MOTOR_ENA,
-            .in1 = PIN_LEFT_MOTOR_IN1,
-            .in2 = PIN_LEFT_MOTOR_IN2,
-            
-            .chA = PIN_LEFT_MOTOR_CHA,
-            .chB = PIN_LEFT_MOTOR_CHB
-        };
-
-        // Right L298N Configuration
-        const int INDEX_RIGHT_MOTOR = 2; // 2, 3
-        const int PIN_RIGHT_MOTOR_ENA = 14;
-        const int PIN_RIGHT_MOTOR_IN1 = 12;
-        const int PIN_RIGHT_MOTOR_IN2 = 13;
-
-        // Right Quadrature Encoder Configuration
-        const int PIN_RIGHT_MOTOR_CHA = 26;
-        const int PIN_RIGHT_MOTOR_CHB = 27;
+        // Quadrature Encoder Configuration
+        const int PIN_MOTOR_CHA = 19;
+        const int PIN_MOTOR_CHB = 18;
 
         // ID Struct
-        const SensoredMotorID RIGHT_MOTOR_ID = {
-            .enA = PIN_RIGHT_MOTOR_ENA,
-            .in1 = PIN_RIGHT_MOTOR_IN1,
-            .in2 = PIN_RIGHT_MOTOR_IN2,
+        const SensoredMotorID MOTOR_ID = {
+            .enA = PIN_MOTOR_ENA,
+            .in1 = PIN_MOTOR_IN1,
+            .in2 = PIN_MOTOR_IN2,
             
-            .chA = PIN_RIGHT_MOTOR_CHA,
-            .chB = PIN_RIGHT_MOTOR_CHB
+            .chA = PIN_MOTOR_CHA,
+            .chB = PIN_MOTOR_CHB
         };
 }
 

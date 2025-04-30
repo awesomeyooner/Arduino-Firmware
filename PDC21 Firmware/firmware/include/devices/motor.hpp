@@ -3,7 +3,6 @@
 
 #include <string>
 #include "../Constants.hpp"
-#include <esp32-hal-ledc.h>
 #include <Arduino.h>
 #include "l298n.hpp"
 #include "quadrature_encoder.hpp"

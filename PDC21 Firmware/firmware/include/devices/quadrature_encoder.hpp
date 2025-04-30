@@ -40,12 +40,12 @@ namespace hardware_component{
 
             // https://forum.arduino.cc/t/attachinterrupts-callback-method-from-a-c-class/461957/6
             
-            void initialize() override{
+            void initialize(void (*callbackA)(void), void (*callbackB)(void)) {
                 pinMode(channelA, INPUT_PULLDOWN);
                 pinMode(channelB, INPUT_PULLDOWN);
 
-                attachInterrupt(digitalPinToInterrupt(channelA), [this](){handleA();}, CHANGE);
-                attachInterrupt(digitalPinToInterrupt(channelB), [this](){handleB();}, CHANGE);
+                attachInterrupt(digitalPinToInterrupt(channelA), callbackA, CHANGE);
+                attachInterrupt(digitalPinToInterrupt(channelB), callbackB, CHANGE);
             }
 
             double get_position() override{

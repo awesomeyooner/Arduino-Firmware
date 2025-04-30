@@ -9,8 +9,9 @@
 #include <std_msgs/msg/int32.h>
 #include <std_msgs/msg/float64.h>
 
-#include "Motor.hpp"
-#include "Encoder.hpp"
+#include "motor.hpp"
+#include "quadrature_encoder.hpp"
+#include "l298n.hpp"
 #include "../util/Utility.hpp"
 #include "../Constants.hpp"
 
@@ -28,8 +29,6 @@ namespace hardware_component{
 
     class MotorController{
 
-        private:
-            
         public:
 
             std::string name;
@@ -39,33 +38,22 @@ namespace hardware_component{
 
             rcl_subscription_t commandSubscriber;
 
-            Motor motor;
-            Encoder encoder;
 
-            MotorController(std::string name, int enablePin, int inputPin1, int inputPin2, int channelEnable, int channel1, int channel2, int channelA, int channelB) : 
+            MotorController(std::string name, int index, int enA, int in1, int in2, int chA, int chB) : 
                 name(name),
-                motor(enablePin, inputPin1, inputPin2, channelEnable, channel1, channel2),
-                encoder(channelA, channelB){
+                motor(false),
+                encoder(chA, chB),
+                driver(index, enA, in1, in2){
                     commandMessage.data = 0;
                 }
 
-            MotorController(std::string name, MotorID motorID, EncoderID encoderID) : 
-                name(name),
-                motor(motorID),
-                encoder(encoderID){
-                    commandMessage.data = 0;
-                }
-
-            MotorController(std::string name, EncoderID encoderID) : 
-                name(name),
-                motor(),
-                encoder(encoderID){
-                    commandMessage.data = 0;
-                }
+            MotorController(std::string name, int index, SensoredMotorID id) : 
+                MotorController(name, index, id.enA, id.in1, id.in2, id.chA, id.chB){}
 
             void initialize(rcl_node_t* node, rclc_executor_t* executor){
+                motor.link_driver(&driver);
+                motor.link_encoder(&encoder);
                 motor.initialize();
-                encoder.initialize();
 
                 RCCHECK(rclc_publisher_init_best_effort(
                     &positionPublisher,
@@ -97,27 +85,28 @@ namespace hardware_component{
                 ));
             }
 
-            void update(bool estop){
-                if(!estop)
-                    motor.update();
-                else
-                    motor.off();
+            void update(bool enabled){
+                motor.update(enabled);
 
-                encoder.update();
+                positionMessage.data = encoder.get_position();
+                velocityMessage.data = encoder.get_velocity();
 
-                positionMessage.data = encoder.position.value;
-                velocityMessage.data = encoder.velocity.value;
-
-                motor.command = commandMessage.data;
+                motor.set_command(commandMessage.data);
 
                 RCSOFTCHECK(rcl_publish(&positionPublisher, &positionMessage, NULL));
                 RCSOFTCHECK(rcl_publish(&velocityPublisher, &velocityMessage, NULL));
             }
 
             int getNumberOfHandles(){
-                return 1; //subscriber
+                return 1; // subscriber
             }
-    };
-}
+
+            private:
+                Motor motor;
+                QuadratureEncoder encoder;
+                L298N driver;
+
+    }; // class MotorController
+} // namespace hardware_component 
 
 #endif

@@ -2,6 +2,7 @@
 #include "devices/motor.hpp"
 #include "devices/l298n.hpp"
 #include "devices/led/builtin_led.hpp"
+#include <Wire.h>
 
 #define PIN_ENA 1
 #define PIN_IN1 2
